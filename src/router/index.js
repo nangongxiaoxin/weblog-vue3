@@ -1,21 +1,29 @@
 import Index from '@/pages/frontend/index.vue'
-import { createRouter, createWebHashHistory } from 'vue-router'
 import Login from '@/pages/admin/login.vue'
+import AdminIndex from '@/pages/admin/index.vue'
+import { createRouter, createWebHashHistory } from 'vue-router'
 
 // 统一在这里声明所有路由
 const routes = [
     {
-        path: '/', // 路由地址
+        path: '/', // 路由地址 首页
         component: Index, // 对应组件
         meta: { // meta 信息
             title: 'Weblog 首页' // 页面标题
         }
     },
     {
-        path: '/login',
+        path: '/login', //登录页
         component: Login,
         meta: {
             title: 'Weblog 登录'
+        }
+    },
+    {
+        path:"/admin/index", //后台首页
+        component: AdminIndex,
+        meta:{
+            title:'Admin 后台首页'
         }
     }
 ]
