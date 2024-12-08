@@ -58,6 +58,7 @@
               placeholder="请输入密码"
               :prefix-icon="Lock"
               clearable
+              show-password
             />
           </el-form-item>
           <el-form-item>
@@ -84,13 +85,14 @@ import { login } from "@/api/admin/user";
 import { ref, reactive, onMounted, onBeforeUnmount } from "vue";
 import { useRouter } from "vue-router";
 import { showMessage } from "@/composables/util";
+import { setToken } from "@/composables/auth";
 
 const router = useRouter();
 
 //定义响应式的表单对象
 const form = reactive({
   username: "slilio",
-  password: "",
+  password: "slilio",
 });
 
 //表单引用 响应式引用对象
@@ -135,12 +137,15 @@ const onSubmit = () => {
   login(form.username, form.password).then((res) => {
     console.log(res);
     //判断是否成功
-    if (res.data.success == true) {
+    if (res.success == true) {
       showMessage("登录成功");
+      //储存cookie
+      let token = res.data.token;
+      setToken(token);
       //路由调整到后台首页
       router.push("/admin/index");
     } else {
-      let message = res.data.message;
+      let message = res.message;
       showMessage(message, "error");
     }
   }).finally(()=>{

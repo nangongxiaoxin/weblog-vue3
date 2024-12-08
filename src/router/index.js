@@ -20,10 +20,10 @@ const routes = [
         }
     },
     {
-        path:"/admin/index", //后台首页
+        path: "/admin/index", //后台首页
         component: AdminIndex,
-        meta:{
-            title:'Admin 后台首页'
+        meta: {
+            title: 'Admin 后台首页'
         }
     }
 ]
@@ -33,8 +33,11 @@ const router = createRouter({
     // 指定路由的历史管理方式，hash 模式指的是 URL 的路径是通过 hash 符号（#）进行标识
     history: createWebHashHistory(),
     // routes: routes 的缩写
-    routes, 
+    routes,
 })
 
 // ES6 模块导出语句，它用于将 router 对象导出，以便其他文件可以导入和使用这个对象
 export default router
+
+
+

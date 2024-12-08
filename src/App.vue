@@ -2,10 +2,12 @@
   <router-view></router-view>
 </template>
 
-<script setup>
+<script setup></script>
 
-</script>
+<style>
+/* 自定义加载顶部loading条样式 */
 
-<style scoped>
-
+#nprogress .bar {
+  background: #409eff !important;
+}
 </style>
