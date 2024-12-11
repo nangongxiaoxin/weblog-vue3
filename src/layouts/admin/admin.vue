@@ -2,7 +2,7 @@
   <!-- 外层容器 -->
   <el-container>
     <!-- 左侧侧边栏 -->
-    <el-aside>
+    <el-aside :width='menuStore.menuWidth'>
       <AdminMenu></AdminMenu>
     </el-aside>
 
@@ -31,10 +31,13 @@
 </template>
 
 <script setup lang="ts">
-import AdminFooter from "./components/adminFooter.vue";
+import AdminFooter from "./components/AdminFooter.vue";
 import AdminHeader from "./components/AdminHeader.vue";
 import AdminMenu from "./components/AdminMenu.vue";
 import AdminTagList from "./components/AdminTagList.vue";
+import { useMenuStore } from '@/stores/menu';
+
+const menuStore = useMenuStore();
 </script>
 
 <style scoped>

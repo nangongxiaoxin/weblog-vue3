@@ -1,17 +1,25 @@
 <template>
   <div class="bg-white h-[64px] flex pr-4 border-b border-slate-200">
     <!-- 左边栏收缩、展开 -->
-    <div
-      class="w-[42px] h-[64px] cursor-pointer flex items-center justify-center text-gray-700 hover:bg-gray-200"
-    >
+    <div class="w-[42px] h-[64px] cursor-pointer flex items-center justify-center text-gray-700 hover:bg-gray-200" @click="handleMenuWidth">
       <!-- 不让 Element Plus 内部的样式覆盖 Tailwind CSS 的样式 -->
       <el-icon>
-        <Fold />
+        <Fold v-if="menuStore.menuWidth == '250px'"/>
+        <Expand v-else />
       </el-icon>
     </div>
 
     <!-- 右边容器，通过 ml-auto 让其在父容器的右边 -->
     <div class="ml-auto flex">
+      <!-- 点击刷新页面 -->
+      <el-tooltip class="box-item" effect="dark" content="刷新" placement="bottom">
+          <div class="w-[42px] h-[64px] cursor-pointer flex items-center justify-center text-gray-700 hover:bg-gray-200"
+              @click="handleRefresh">
+              <el-icon>
+                  <Refresh />
+              </el-icon>
+          </div>
+      </el-tooltip>
       <!-- 点击全屏展示 -->
       <el-tooltip
         class="box-item"
@@ -19,12 +27,11 @@
         content="全屏"
         placement="bottom"
       >
-        <div
-          class="w-[42px] h-[64px] cursor-pointer flex items-center justify-center text-gray-700 mr-2 hover:bg-gray-200"
-        >
+      <div class="w-[42px] h-[64px] cursor-pointer flex items-center justify-center text-gray-700 mr-2 hover:bg-gray-200" @click="toggle">
           <!-- 不让 Element Plus 内部的样式覆盖 Tailwind CSS 的样式 -->
           <el-icon>
-            <FullScreen />
+            <FullScreen v-if="!isFullscreen"/>
+            <Aim v-else />
           </el-icon>
         </div>
       </el-tooltip>
@@ -54,5 +61,26 @@
     </div>
   </div>
 </template>
+
+<script setup>
+import { useMenuStore } from '@/stores/menu';
+import { useFullscreen } from '@vueuse/core';
+
+  //引入菜单store
+  const menuStore = useMenuStore();
+  //isFullscreen表示当前是否处于全屏；toggle用于动态切换全屏，非全屏
+  const { isFullscreen, toggle } = useFullscreen();
+  //刷新页面
+  const handleRefresh = ()=> {
+    //刷新页面
+    location.reload()
+  }
+
+  //icon点击事件
+  const handleMenuWidth = ()=>{
+    //动态设置菜单宽度大小
+    menuStore.handleMenuWidth();
+  }
+</script>
 
 <style scoped></style>
