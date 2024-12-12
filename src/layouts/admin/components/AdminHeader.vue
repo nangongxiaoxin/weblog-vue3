@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-white h-[64px] flex pr-4 border-b border-slate-200">
+  <div class="bg-white h-[64px] flex pr-4 border-b border-slate-100">
     <!-- 左边栏收缩、展开 -->
     <div class="w-[42px] h-[64px] cursor-pointer flex items-center justify-center text-gray-700 hover:bg-gray-200" @click="handleMenuWidth">
       <!-- 不让 Element Plus 内部的样式覆盖 Tailwind CSS 的样式 -->
@@ -36,7 +36,7 @@
         </div>
       </el-tooltip>
       <!-- 登录用户头像 -->
-      <el-dropdown>
+      <el-dropdown class="flex items-center justify-center">
         <span
           class="el-dropdown-link flex items-center justify-center text-gray-700 text-xs"
         >
