@@ -2,7 +2,7 @@ import '@/assets/main.css'
 import 'animate.css'
 import 'nprogress/nprogress.css'
 
-import { createPinia } from 'pinia'
+
 import { createApp } from 'vue'
 import App from '@/App.vue'
 // 导入路由
@@ -12,9 +12,10 @@ import '@/permission'
 // 导入 Element Plus 图标
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 
-const app = createApp(App)
-const pinia = createPinia()
+const app = createApp(App);
 
+//引入全局状态管理
+import pinia from '@/stores'
 // 应用路由
 app.use(router);
 

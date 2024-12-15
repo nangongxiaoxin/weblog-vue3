@@ -86,8 +86,10 @@ import { ref, reactive, onMounted, onBeforeUnmount } from "vue";
 import { useRouter } from "vue-router";
 import { showMessage } from "@/composables/util";
 import { setToken } from "@/composables/cookie";
+import { useUserStore } from '@/stores/user'
 
 const router = useRouter();
+const userStore = useUserStore();
 
 //定义响应式的表单对象
 const form = reactive({
@@ -142,6 +144,8 @@ const onSubmit = () => {
       //储存cookie
       let token = res.data.token;
       setToken(token);
+      //获取用户信息并存储到全局
+      userStore.setUserInfo();
       //路由调整到后台首页
       router.push("/admin/index");
     } else {
