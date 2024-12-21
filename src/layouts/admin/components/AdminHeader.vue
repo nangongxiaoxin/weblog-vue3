@@ -79,16 +79,14 @@
     </div>
   </div>
 
-  <!-- 修改密码 -->
-  <el-dialog
-    v-model="dialogVisible"
-    title="修改密码"
-    width="40%"
-    :draggable="true"
-    :close-on-click-modal="false"
-    :close-on-press-escape="false"
+  <!-- 引入弹窗组件 修改密码-->
+  <FormDialog
+      ref="formDialogRef"
+      title="修改密码"
+      destroyOnClose
+      @submit="onSubmit"
   >
-    <el-form ref="formRef" :rules="rules" :model="form">
+	<el-form ref="formRef" :rules="rules" :model="form">
       <el-form-item label="用户名" prop="username" label-width="120px">
         <!-- 输入框组件 -->
         <el-input
@@ -120,16 +118,15 @@
         />
       </el-form-item>
     </el-form>
-    <template #footer>
-      <span class="dialog-footer">
-        <el-button @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="onSubmit"> 提交 </el-button>
-      </span>
-    </template>
-  </el-dialog>
+  </FormDialog>
+
+
+  <!-- 修改密码 -->
+ 
 </template>
 
 <script setup>
+import FormDialog from "@/components/FormDialog.vue";
 import { ref, reactive, watch } from 'vue'
 import { useMenuStore } from '@/stores/menu'
 import { useUserStore } from '@/stores/user'
@@ -195,7 +192,7 @@ const handleCommand = (command) => {
   //更新密码
   if (command == "updatePassword") {
     // 显示修改密码对话框
-    dialogVisible.value = true;
+    formDialogRef.value.open();
   } else if (command == "logout") {
     logout();
   }
@@ -223,7 +220,8 @@ const onSubmit = () => {
       showMessage("两次密码输入不一致，请检查！", "warning");
       return;
     }
-
+    // 显示加载中
+    formDialogRef.value.showBtnLoading();
     // 调用修改用户密码接口
     updateAdminPassword(form).then((res) => {
       console.log(res);
@@ -234,8 +232,7 @@ const onSubmit = () => {
         userStore.logout();
 
         // 隐藏对话框
-        dialogVisible.value = false;
-
+        formDialogRef.value.close();
         // 跳转登录页
         router.push("/login");
       } else {
@@ -244,7 +241,7 @@ const onSubmit = () => {
         // 提示消息
         showMessage(message, "error");
       }
-    });
+    }).finally(()=>formDialogRef.value.closeBtnLoading());
   });
 };
 
@@ -258,6 +255,10 @@ watch(() => userStore.userInfo.username, (newValue, oldValue) => {
       // 重新将新的值，设置会 form 对象中
       form.username = newValue
 });
+
+
+// 按钮事件 dialog显示
+const formDialogRef = ref(null);
 </script>
 
 <style scoped></style>
