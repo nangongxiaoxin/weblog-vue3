@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-slate-800 h-screen text-white menu-container transition-all" :style="{ width: menuStore.menuWidth }">
+  <div class="fixed overflow-y-auto bg-slate-800 h-screen text-white menu-container transition-all" :style="{ width: menuStore.menuWidth }">
     <!-- 顶部logo 指定高度为64px 和右边的header头保持同样高度 -->
     <div class="flex items-center justify-center h-[64px]">
       <img v-if="menuStore.menuWidth == '250px'" src="@/assets/weblog-log.png" class="h-[60px]" />
