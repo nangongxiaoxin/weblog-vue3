@@ -1,6 +1,7 @@
 import axios from "axios";
-import { getToken } from "./composables/cookie";
+import { getToken, removeToken } from "./composables/cookie";
 import { showMessage } from "./composables/util";
+import { useUserStore } from '@/stores/user'
 
 //创建axios实例
 const instance = axios.create({
@@ -35,8 +36,19 @@ instance.interceptors.response.use(function (response) {
     //超过2xx会触发该函数
     //对超过2xx的响应做什么
 
+    //状态码401
+    let status = error.response.status
+    if(status == 401){
+        // 退出登录
+        let userStore = useUserStore()
+        userStore.logout()
+        // 刷新页面
+        location.reload()
+    }
+
     //错误提示 以及服务离线的提示
     let errorMsg = error.response.data.message || '请求失败';
+
     //弹窗提示
     showMessage(errorMsg, 'error');
 
