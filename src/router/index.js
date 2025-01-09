@@ -6,6 +6,8 @@ import AdminArticleList from '@/pages/admin/article-list.vue'
 import AdminCategoryList from '@/pages/admin/category-list.vue'
 import AdminTagList from '@/pages/admin/tag-list.vue'
 import AdminBlogSetting from '@/pages/admin/blog-setting.vue'
+import ArchiveList from '@/pages/frontend/archive-list.vue'
+import CategoryList from '@/pages/frontend/category-list.vue'
 import { createRouter, createWebHashHistory } from 'vue-router'
 
 // 统一在这里声明所有路由
@@ -58,12 +60,26 @@ const routes = [
                 }
             },
             {
-                path: "/admin/blog/setting",
+                path: "/admin/blog/setting", //个人信息
                 component: AdminBlogSetting,
                 meta: {
                     title: '博客设置'
                 }
-            }
+            },
+            {
+                path: '/archive/list', // 归档页
+                component: ArchiveList,
+                meta: { // meta 信息
+                    title: 'Weblog 归档页'
+                }
+            },
+            {
+                path: '/category/list', // 分类页
+                component: CategoryList,
+                meta: { // meta 信息
+                    title: 'Weblog 分类页'
+                }
+            },
         ]
     }
 ]
