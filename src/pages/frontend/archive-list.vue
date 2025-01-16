@@ -94,17 +94,20 @@
 
     </main>
 
+    <!-- 返回顶部 -->
+    <ScorllToTopButton></ScorllToTopButton>
     <Footer></Footer>
 </template>
 
 <script setup>
 import Header from '@/layouts/frontend/components/Header.vue'
 import Footer from '@/layouts/frontend/components/Footer.vue'
+import ScorllToTopButton from '@/layouts/frontend/components/ScorllToTopButton.vue'
 import UserInfoCard from '@/layouts/frontend/components/UserInfoCard.vue'
 import TagListCard from '@/layouts/frontend/components/TagListCard.vue'
 import CategoryListCard from '@/layouts/frontend/components/CategoryListCard.vue'
 import { getArchivePageList } from '@/api/frontend/archive'
-import { onMounted,ref } from 'vue'
+import { onMounted, ref } from 'vue'
 
 // 文章归档
 const archives = ref([])

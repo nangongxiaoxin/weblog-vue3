@@ -38,7 +38,7 @@
                     <!-- 文章 -->
                     <article>
                         <!-- 文章标题 -->
-                        <h1 class="mt-4 font-bold text-3xl">{{ article.title }}</h1>
+                        <h1 v-if="article.title" class="mt-4 font-bold text-3xl">{{ article.title }}</h1>
                         <!-- 文章 meta 信息，如发布时间等 -->
                         <div class="text-gray-400 flex items-center mt-5 text-sm">
                             <!-- 发布时间 -->
@@ -74,11 +74,12 @@
                     </article>
 
                     <!-- 正文 -->
-                    <div class="mt-5 article-content" v-html="article.content"></div>
+                    <div ref="articleContentRef" class="mt-5 article-content" v-viewer v-html="article.content"></div>
 
                     <!-- 标签集合 -->
-                    <div v-if="article.tags && article.tags.length " class="mt-5">
-                        <span @click="goTagArticleListPage(tag.id,tag.name)" v-for="(tag,index) in article.tags" :key="index"
+                    <div v-if="article.tags && article.tags.length" class="mt-5">
+                        <span @click="goTagArticleListPage(tag.id, tag.name)" v-for="(tag, index) in article.tags"
+                            :key="index"
                             class="inline-block mb-1 cursor-pointer bg-green-100 text-green-800 text-xs font-medium mr-2 px-3 py-1 rounded-full hover:bg-green-200 hover:text-green-900 dark:bg-green-900 dark:text-green-300">
                             #{{ tag.name }}
                         </span>
@@ -89,7 +90,8 @@
                         <!-- basis-1/2 用于占用 flex 布局的一半空间 -->
                         <div class="basis-1/2">
                             <!-- h-full 指定高度占满 -->
-                            <a v-if="article.preArticle" @click="router.push('/article/' + article.preArticle.articleId)"
+                            <a v-if="article.preArticle"
+                                @click="router.push('/article/' + article.preArticle.articleId)"
                                 class="flex flex-col h-full p-4 mr-3 text-base font-medium text-gray-500 bg-white border border-gray-300 rounded-lg hover:border-blue-500 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
                                 <div>
                                     <svg class="inline w-3.5 h-3.5 mr-2 mb-1" aria-hidden="true"
@@ -105,7 +107,8 @@
 
                         <div class="basis-1/2">
                             <!-- text-right 指定文字居右显示 -->
-                            <a v-if="article.nextArticle" @click="router.push('/article/' + article.nextArticle.articleId)"
+                            <a v-if="article.nextArticle"
+                                @click="router.push('/article/' + article.nextArticle.articleId)"
                                 class="flex flex-col h-full text-right p-4 text-base font-medium text-gray-500 bg-white border border-gray-300 rounded-lg hover:border-blue-500 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
                                 <div>
                                     下一篇
@@ -125,7 +128,7 @@
             <!--  TODO右侧组件增加粘性效果 -->
             <!-- 右边栏  -->
             <aside class="col-span-4 md:col-span-1">
-                <div class="sticky top-[5.5rem] h-[calc(100vh-5.5rem)] overflow-y-auto hide-scrollbar">
+                <div>
                     <!-- 博主信息 -->
                     <UserInfoCard></UserInfoCard>
 
@@ -135,9 +138,15 @@
                     <!-- 标签 -->
                     <TagListCard></TagListCard>
                 </div>
+
+                <!-- 目录 -->
+                <Toc></Toc>
             </aside>
         </div>
     </main>
+
+    <!-- 返回顶部 -->
+    <ScorllToTopButton></ScorllToTopButton>
 
     <Footer></Footer>
 </template>
@@ -145,12 +154,17 @@
 <script setup>
 import Header from '@/layouts/frontend/components/Header.vue'
 import Footer from '@/layouts/frontend/components/Footer.vue'
+import ScorllToTopButton from '@/layouts/frontend/components/ScorllToTopButton.vue';
 import CategoryListCard from '@/layouts/frontend/components/CategoryListCard.vue';
 import TagListCard from '@/layouts/frontend/components/TagListCard.vue';
 import UserInfoCard from '@/layouts/frontend/components/UserInfoCard.vue';
+import Toc from '@/layouts/frontend/components/Toc.vue'
 import { useRoute, useRouter } from 'vue-router';
 import { getArticleDetail } from '@/api/frontend/article'
-import { ref,watch } from 'vue'
+import { ref, watch, onMounted } from 'vue'
+import hljs from 'highlight.js'
+// 代码高亮样式
+import 'highlight.js/styles/tokyo-night-dark.css'
 
 
 const route = useRoute();
@@ -162,8 +176,12 @@ const article = ref({})
 //获取文章数据
 function refreshArticleDetail(articleId) {
     getArticleDetail(articleId).then((res) => {
-        if (res.success) {
-            article.value = res.data;
+        //文章不存在（错误码为：20010）
+        if (!res.success && res.errorCode == '20010') {
+            //手动跳转到404页面
+            router.push({ name: 'NotFound' })
+        } else if (res.success) {
+            article.value = res.data
         }
     })
 }
@@ -173,13 +191,13 @@ refreshArticleDetail(route.params.articleId)
 //跳转分类文章列表页
 const goCategoryArticleListPage = (id, name) => {
     // 跳转时通过 query 携带参数（分类 ID、分类名称）
-    router.push({path: '/category/article/list', query: {id, name}})
+    router.push({ path: '/category/article/list', query: { id, name } })
 }
 
 // 跳转标签文章列表页
 const goTagArticleListPage = (id, name) => {
     // 跳转时通过 query 携带参数（标签 ID、标签名称）
-    router.push({path: '/tag/article/list', query: {id, name}})
+    router.push({ path: '/tag/article/list', query: { id, name } })
 }
 
 // 监听路由
@@ -188,25 +206,48 @@ watch(route, (newRoute, oldRoute) => {
     refreshArticleDetail(newRoute.params.articleId)
 })
 
+// 正文 div 引用
+const articleContentRef = ref(null)
+onMounted(() => {
+    // 使用 MutationObserver 监视 DOM 的变化
+    const observer = new MutationObserver(mutationsList => {
+        for (let mutation of mutationsList) {
+            if (mutation.type === 'childList') {
+                // 获取所有 pre code 节点
+                let highlight = document.querySelectorAll('pre code')
+                // 循环高亮
+                highlight.forEach((block) => {
+                    hljs.highlightBlock(block)
+                })
+            }
+        }
+    })
+    // 配置监视子节点的变化
+    const config = { childList: true, subtree: true }
+    // 开始观察正文内容变化
+    observer.observe(articleContentRef.value, config)
+})
 </script>
 
 <style scoped>
 /* 隐藏滚动条的 CSS */
 .hide-scrollbar {
-  scrollbar-width: none; /* Firefox */
+    scrollbar-width: none;
+    /* Firefox */
 }
 
 .hide-scrollbar::-webkit-scrollbar {
-  display: none; /* Chrome, Safari 和 Opera */
+    display: none;
+    /* Chrome, Safari 和 Opera */
 }
 
 /* h1, h2, h3, h4, h5, h6 标题样式 */
 ::v-deep(.article-content h1,
-.article-content h2,
-.article-content h3,
-.article-content h4,
-.article-content h5,
-.article-content h6) {
+    .article-content h2,
+    .article-content h3,
+    .article-content h4,
+    .article-content h5,
+    .article-content h6) {
     color: #292525;
     line-height: 150%;
     font-family: PingFang SC, Helvetica Neue, Helvetica, Hiragino Sans GB, Microsoft YaHei, "\5FAE\8F6F\96C5\9ED1", Arial, sans-serif;
@@ -311,7 +352,7 @@ watch(route, (newRoute, oldRoute) => {
 }
 
 ::v-deep(.article-content ul li p) {
-    margin-bottom: 0!important;
+    margin-bottom: 0 !important;
 }
 
 ::v-deep(.article-content ul ul li) {
@@ -334,7 +375,7 @@ watch(route, (newRoute, oldRoute) => {
 }
 
 ::v-deep(.article-content img:hover,
-img:focus) {
+    img:focus) {
     box-shadow: 2px 2px 10px 0 rgba(0, 0, 0, .15);
 }
 
@@ -360,6 +401,35 @@ img:focus) {
     color: rgb(41, 128, 185);
     background-color: rgba(27, 31, 35, 0.05);
     font-family: Operator Mono, Consolas, Monaco, Menlo, monospace;
+}
+
+/* code左上角三个点 */
+::v-deep(code) {
+    font-size: 98%;
+}
+
+::v-deep(pre) {
+    margin-bottom: 20px;
+}
+
+::v-deep(pre code.hljs) {
+    padding-top: 2rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    padding-bottom: 0.7rem;
+    border-radius: 6px;
+}
+
+::v-deep(pre:before) {
+    background: #fc625d;
+    border-radius: 50%;
+    box-shadow: 20px 0 #fdbc40, 40px 0 #35cd4b;
+    content: ' ';
+    height: 10px;
+    margin-top: 10px;
+    margin-left: 10px;
+    position: absolute;
+    width: 10px;
 }
 
 /* 表格样式 */
