@@ -2,10 +2,8 @@
   <el-affix :offset="0">
     <div class="bg-white h-[64px] flex pr-4 border-b border-slate-100">
       <!-- 左边栏收缩、展开 -->
-      <div
-        class="w-[42px] h-[64px] cursor-pointer flex items-center justify-center text-gray-700 hover:bg-gray-200"
-        @click="handleMenuWidth"
-      >
+      <div class="w-[42px] h-[64px] cursor-pointer flex items-center justify-center text-gray-700 hover:bg-gray-200"
+        @click="handleMenuWidth">
         <!-- 不让 Element Plus 内部的样式覆盖 Tailwind CSS 的样式 -->
         <el-icon>
           <Fold v-if="menuStore.menuWidth == '250px'" />
@@ -16,32 +14,28 @@
       <!-- 右边容器，通过 ml-auto 让其在父容器的右边 -->
       <div class="ml-auto flex">
         <!-- 点击刷新页面 -->
-        <el-tooltip
-          class="box-item"
-          effect="dark"
-          content="刷新"
-          placement="bottom"
-        >
-          <div
-            class="w-[42px] h-[64px] cursor-pointer flex items-center justify-center text-gray-700 hover:bg-gray-200"
-            @click="handleRefresh"
-          >
+        <el-tooltip class="box-item" effect="dark" content="刷新" placement="bottom">
+          <div class="w-[42px] h-[64px] cursor-pointer flex items-center justify-center text-gray-700 hover:bg-gray-200"
+            @click="handleRefresh">
             <el-icon>
               <Refresh />
             </el-icon>
           </div>
         </el-tooltip>
+        <!-- 点击跳转前台首页 -->
+        <el-tooltip class="box-item" effect="dark" content="跳转前台" placement="bottom">
+          <div class="w-[42px] h-[64px] cursor-pointer flex items-center justify-center text-gray-700 hover:bg-gray-200"
+            @click="router.push('/')">
+            <el-icon>
+              <Monitor />
+            </el-icon>
+          </div>
+        </el-tooltip>
         <!-- 点击全屏展示 -->
-        <el-tooltip
-          class="box-item"
-          effect="dark"
-          content="全屏"
-          placement="bottom"
-        >
+        <el-tooltip class="box-item" effect="dark" content="全屏" placement="bottom">
           <div
             class="w-[42px] h-[64px] cursor-pointer flex items-center justify-center text-gray-700 mr-2 hover:bg-gray-200"
-            @click="toggle"
-          >
+            @click="toggle">
             <!-- 不让 Element Plus 内部的样式覆盖 Tailwind CSS 的样式 -->
             <el-icon>
               <FullScreen v-if="!isFullscreen" />
@@ -50,19 +44,11 @@
           </div>
         </el-tooltip>
         <!-- 登录用户头像 -->
-        <el-dropdown
-          class="flex items-center justify-center"
-          @command="handleCommand"
-        >
-          <span
-            class="el-dropdown-link flex items-center justify-center text-gray-700 text-xs"
-          >
+        <el-dropdown class="flex items-center justify-center" @command="handleCommand">
+          <span class="el-dropdown-link flex items-center justify-center text-gray-700 text-xs">
             <!-- 头像 Avatar -->
-            <el-avatar
-              class="mr-2"
-              :size="25"
-              src="https://img.quanxiaoha.com/quanxiaoha/f97361c0429d4bb1bc276ab835843065.jpg"
-            />
+            <el-avatar class="mr-2" :size="25"
+              src="https://img.quanxiaoha.com/quanxiaoha/f97361c0429d4bb1bc276ab835843065.jpg" />
             {{ userStore.userInfo.username }}
             <el-icon class="el-icon--right">
               <arrow-down />
@@ -70,9 +56,7 @@
           </span>
           <template #dropdown>
             <el-dropdown-menu>
-              <el-dropdown-item command="updatePassword"
-                >修改密码</el-dropdown-item
-              >
+              <el-dropdown-item command="updatePassword">修改密码</el-dropdown-item>
               <el-dropdown-item command="logout">退出登录</el-dropdown-item>
             </el-dropdown-menu>
           </template>
@@ -82,49 +66,21 @@
   </el-affix>
 
   <!-- 引入弹窗组件 修改密码-->
-  <FormDialog
-      ref="formDialogRef"
-      title="修改密码"
-      destroyOnClose
-      @submit="onSubmit"
-  >
-	<el-form ref="formRef" :rules="rules" :model="form">
+  <FormDialog ref="formDialogRef" title="修改密码" destroyOnClose @submit="onSubmit">
+    <el-form ref="formRef" :rules="rules" :model="form">
       <el-form-item label="用户名" prop="username" label-width="120px">
         <!-- 输入框组件 -->
-        <el-input
-          size="large"
-          v-model="form.username"
-          placeholder="请输入用户名"
-          clearable
-          disabled
-        />
+        <el-input size="large" v-model="form.username" placeholder="请输入用户名" clearable disabled />
       </el-form-item>
       <el-form-item label="密码" prop="password" label-width="120px">
-        <el-input
-          size="large"
-          type="password"
-          v-model="form.password"
-          placeholder="请输入密码"
-          clearable
-          show-password
-        />
+        <el-input size="large" type="password" v-model="form.password" placeholder="请输入密码" clearable show-password />
       </el-form-item>
       <el-form-item label="确认密码" prop="rePassword" label-width="120px">
-        <el-input
-          size="large"
-          type="password"
-          v-model="form.rePassword"
-          placeholder="请确认密码"
-          clearable
-          show-password
-        />
+        <el-input size="large" type="password" v-model="form.rePassword" placeholder="请确认密码" clearable show-password />
       </el-form-item>
     </el-form>
   </FormDialog>
 
-
-  <!-- 修改密码 -->
- 
 </template>
 
 <script setup>
@@ -243,19 +199,19 @@ const onSubmit = () => {
         // 提示消息
         showMessage(message, "error");
       }
-    }).finally(()=>formDialogRef.value.closeBtnLoading());
+    }).finally(() => formDialogRef.value.closeBtnLoading());
   });
 };
 
 // 监听 Pinia store 中的某个值的变化
 watch(() => userStore.userInfo.username, (newValue, oldValue) => {
-      // 在这里处理变化后的值
-      console.log('新值:', newValue);
-      console.log('旧值:', oldValue);
-      
-      // 可以在这里执行任何你需要的逻辑
-      // 重新将新的值，设置会 form 对象中
-      form.username = newValue
+  // 在这里处理变化后的值
+  console.log('新值:', newValue);
+  console.log('旧值:', oldValue);
+
+  // 可以在这里执行任何你需要的逻辑
+  // 重新将新的值，设置会 form 对象中
+  form.username = newValue
 });
 
 
