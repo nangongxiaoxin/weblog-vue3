@@ -174,9 +174,7 @@
                         </svg>
                         每日文章发布热点图
                     </h2>
-                    <div>
-                        内容
-                    </div>
+                    <ArticlePublishCalendar :value="articlePublishInfo"></ArticlePublishCalendar>
                 </div>
             </div>
 
@@ -198,9 +196,7 @@
                         </svg>
                         近一周 PV 访问量
                     </h2>
-                    <div>
-                        内容
-                    </div>
+                    <ArticlePVLineChat :value="articlePVInfo"></ArticlePVLineChat>
                 </div>
             </div>
         </div>
@@ -210,7 +206,10 @@
 
 <script setup>
 import { ref } from 'vue'
-import { getBaseStatisticsInfo } from '@/api/admin/dashboard'
+import { getBaseStatisticsInfo, getPublishArticleStatisticsInfo,getArticlePVStatisticsInfo } from '@/api/admin/dashboard'
+import ArticlePublishCalendar from '@/components/ArticlePublishCalendar.vue'
+import { showMessage } from '@/composables/util'
+import ArticlePVLineChat from '@/components/ArticlePVLineChat.vue'
 
 //文章数
 const articleTotalCount = ref(0)
@@ -223,12 +222,31 @@ const pvTotalCount = ref(0)
 
 
 //数量接口调用获取
-getBaseStatisticsInfo().then(res=>{
-    if(res.success){
+getBaseStatisticsInfo().then(res => {
+    if (res.success) {
         articleTotalCount.value = res.data.articleTotalCount;
         categoryTotalCount.value = res.data.categoryTotalCount;
         tagTotalCount.value = res.data.tagTotalCount;
         pvTotalCount.value = res.data.pvTotalCount;
     }
 })
+
+//按日统计文章发布数据
+const articlePublishInfo = ref({})
+getPublishArticleStatisticsInfo().then((res) => {
+    if (res.success) {
+        articlePublishInfo.value = res.data;
+    }else{
+        showMessage("按日统计文章发布数据获取错误");
+    }
+})
+
+// 近一周文章 PV 数据
+const articlePVInfo = ref({})
+getArticlePVStatisticsInfo().then((res) => {
+    if (res.success) {
+        articlePVInfo.value = res.data
+    }
+})
+
 </script>
