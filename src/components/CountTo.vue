@@ -12,11 +12,16 @@ const d = reactive({
     num: 0
 })
 
+
 // 对外暴露的属性值
 const props = defineProps({
     value: { // 属性值名称
         type: Number, // 类型为数值
         default: 0 // 默认为 0
+    },
+    customClass: { // 自定义样式
+        type: String, // 字符串类型
+        default: '' // 默认为空
     }
 })
 
@@ -31,4 +36,5 @@ animateToValue()
 
 // 侦听属性, 监听 props.value 的变化，一旦 props.value 发生变化，就调用 animateToValue 函数执行动画
 watch(() => props.value, () => animateToValue())
+
 </script>
