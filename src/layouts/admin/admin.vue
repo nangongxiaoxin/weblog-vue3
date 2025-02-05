@@ -1,6 +1,6 @@
 <template>
   <!-- 外层容器 -->
-  <el-container>
+  <el-container class="dark:bg-gray-700">
     <!-- 左侧侧边栏 -->
     <el-aside :width="menuStore.menuWidth">
       <AdminMenu></AdminMenu>
@@ -45,8 +45,16 @@ import AdminHeader from "./components/AdminHeader.vue";
 import AdminMenu from "./components/AdminMenu.vue";
 import AdminTagList from "./components/AdminTagList.vue";
 import { useMenuStore } from "@/stores/menu";
+import { onMounted } from 'vue';
 
 const menuStore = useMenuStore();
+
+//TODO 暂时屏蔽后台黑夜模式
+onMounted(() => {
+    // 移除 html 标签中的 class="dark"
+    document.documentElement.classList.remove('dark');
+})
+
 </script>
 
 <style scoped>
