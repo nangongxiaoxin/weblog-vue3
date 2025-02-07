@@ -91,7 +91,7 @@ const goCategoryArticleListPage = (id, name) => {
 
 // 所有分类
 const categories = ref([])
-getCategoryList().then((res) => {
+getCategoryList({}).then((res) => {
     if (res.success) {
         categories.value = res.data
     }
