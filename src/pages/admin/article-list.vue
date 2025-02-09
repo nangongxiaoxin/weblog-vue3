@@ -12,8 +12,7 @@
         <el-text>创建日期</el-text>
         <div class="ml-3 w-30 mr-5">
           <!-- 日期选择组件（区间选择） -->
-          <el-date-picker v-model="pickDate" type="daterange" range-separator="至" start-placeholder="开始时间"
-            end-placeholder="结束时间" size="default" :shortcuts="shortcuts" @change="datepickerChange" />
+          <el-date-picker v-model="pickDate" type="daterange" range-separator="至" start-placeholder="开始时间" end-placeholder="结束时间" size="default" :shortcuts="shortcuts" @change="datepickerChange" />
         </div>
 
         <el-button type="primary" class="ml-3" :icon="Search" @click="getTableData">查询</el-button>
@@ -30,7 +29,8 @@
             <el-icon class="mr-1">
               <EditPen />
             </el-icon>
-            写文章</el-button>
+            写文章</el-button
+          >
         </div>
       </div>
 
@@ -41,6 +41,11 @@
         <el-table-column prop="cover" label="封面" width="180">
           <template #default="scope">
             <el-image style="width: 50px" :src="scope.row.cover" />
+          </template>
+        </el-table-column>
+        <el-table-column prop="isTop" label="是否置顶" width="100">
+          <template #default="scope">
+            <el-switch @change="handleIsTopChange(scope.row)" v-model="scope.row.isTop" inline-prompt :active-icon="Check" :inactive-icon="Close" />
           </template>
         </el-table-column>
         <el-table-column prop="createTime" label="发布时间" width="180" />
@@ -70,9 +75,7 @@
 
       <!-- 分页 -->
       <div class="mt-10 flex justify-center">
-        <el-pagination v-model:current-page="current" v-model:page-size="size" :page-sizes="[10, 20, 50]" :small="false"
-          :background="true" layout="total, sizes, prev, pager, next, jumper" :total="total"
-          @size-change="handleSizeChange" @current-change="getTableData" />
+        <el-pagination v-model:current-page="current" v-model:page-size="size" :page-sizes="[10, 20, 50]" :small="false" :background="true" layout="total, sizes, prev, pager, next, jumper" :total="total" @size-change="handleSizeChange" @current-change="getTableData" />
       </div>
     </el-card>
 
@@ -108,8 +111,7 @@
           <MdEditor v-model="form.content" @onUploadImg="onUploadImg" editorId="publishArticleEditor" />
         </el-form-item>
         <el-form-item label="封面" prop="cover">
-          <el-upload class="avatar-uploader" action="#" :auto-upload="false" :on-change="handleCoverChange"
-            :show-file-list="false">
+          <el-upload class="avatar-uploader" action="#" :auto-upload="false" :on-change="handleCoverChange" :show-file-list="false">
             <img v-if="form.cover" :src="form.cover" class="avatar" />
             <el-icon v-else class="avatar-uploader-icon">
               <Plus />
@@ -128,9 +130,7 @@
         <el-form-item label="标签" prop="tags">
           <span class="w-60">
             <!-- 标签选择 -->
-            <el-select v-model="form.tags" multiple filterable remote reserve-keyword placeholder="请输入文章标签"
-              remote-show-suffix allow-create default-first-option :remote-method="remoteMethod"
-              :loading="tagSelectLoading" size="large">
+            <el-select v-model="form.tags" multiple filterable remote reserve-keyword placeholder="请输入文章标签" remote-show-suffix allow-create default-first-option :remote-method="remoteMethod" :loading="tagSelectLoading" size="large">
               <el-option v-for="item in tags" :key="item.value" :label="item.label" :value="item.value" />
             </el-select>
           </span>
@@ -139,11 +139,10 @@
     </el-dialog>
 
     <!-- 编辑博客 -->
-    <el-dialog v-model="isArticleUpdateEditorShow" :fullscreen="true" :show-close="false"
-      :close-on-press-escape="false">
+    <el-dialog v-model="isArticleUpdateEditorShow" :fullscreen="true" :show-close="false" :close-on-press-escape="false">
       <template #header="{ close, titleId, titleClass }">
         <!-- 固钉组件，固钉到顶部 -->
-        <el-affix :offset="20" style="width: 100%;">
+        <el-affix :offset="20" style="width: 100%">
           <!-- 指定 flex 布局， 高度为 10， 背景色为白色 -->
           <div class="flex h-10 bg-white">
             <!-- 字体加粗 -->
@@ -164,16 +163,14 @@
       <!-- label-position="top" 用于指定 label 元素在上面 -->
       <el-form :model="updateArticleForm" ref="updateArticleFormRef" label-position="top" size="large" :rules="rules">
         <el-form-item label="标题" prop="title">
-          <el-input v-model="updateArticleForm.title" autocomplete="off" size="large" maxlength="40" show-word-limit
-            clearable />
+          <el-input v-model="updateArticleForm.title" autocomplete="off" size="large" maxlength="40" show-word-limit clearable />
         </el-form-item>
         <el-form-item label="内容" prop="content">
           <!-- Markdown 编辑器 -->
           <MdEditor v-model="updateArticleForm.content" @onUploadImg="onUploadImg" editorId="updateArticleEditor" />
         </el-form-item>
         <el-form-item label="封面" prop="cover">
-          <el-upload class="avatar-uploader" action="#" :on-change="handleUpdateCoverChange" :auto-upload="false"
-            :show-file-list="false">
+          <el-upload class="avatar-uploader" action="#" :on-change="handleUpdateCoverChange" :auto-upload="false" :show-file-list="false">
             <img v-if="updateArticleForm.cover" :src="updateArticleForm.cover" class="avatar" />
             <el-icon v-else class="avatar-uploader-icon">
               <Plus />
@@ -192,9 +189,7 @@
         <el-form-item label="标签" prop="tags">
           <span class="w-60">
             <!-- 标签选择 -->
-            <el-select v-model="updateArticleForm.tags" multiple filterable remote reserve-keyword placeholder="请输入文章标签"
-              remote-show-suffix allow-create default-first-option :remote-method="remoteMethod"
-              :loading="tagSelectLoading" size="large">
+            <el-select v-model="updateArticleForm.tags" multiple filterable remote reserve-keyword placeholder="请输入文章标签" remote-show-suffix allow-create default-first-option :remote-method="remoteMethod" :loading="tagSelectLoading" size="large">
               <el-option v-for="item in tags" :key="item.value" :label="item.label" :value="item.value" />
             </el-select>
           </span>
@@ -206,16 +201,16 @@
 
 <script setup>
 import { ref, reactive } from "vue";
-import { Search, RefreshRight } from "@element-plus/icons-vue";
+import { Search, RefreshRight, Check, Close } from "@element-plus/icons-vue";
 import moment from "moment";
-import { getArticlePageList, deleteArticle, publishArticle, getArticleDetail, updateArticle } from '@/api/admin/article'
+import { getArticlePageList, deleteArticle, publishArticle, getArticleDetail, updateArticle, updateArticleIsTop } from "@/api/admin/article";
 import { showMessage, showModel } from "@/composables/util";
-import { MdEditor } from 'md-editor-v3'
-import 'md-editor-v3/lib/style.css'
-import { uploadFile } from '@/api/admin/file'
-import { getCategorySelectList } from '@/api/admin/category'
-import { searchTags, getTagSelectList } from '@/api/admin/tag'
-import { useRouter } from 'vue-router'
+import { MdEditor } from "md-editor-v3";
+import "md-editor-v3/lib/style.css";
+import { uploadFile } from "@/api/admin/file";
+import { getCategorySelectList } from "@/api/admin/category";
+import { searchTags, getTagSelectList } from "@/api/admin/tag";
+import { useRouter } from "vue-router";
 
 // 模糊搜索的文章标题
 const searchArticleTitle = ref("");
@@ -347,221 +342,240 @@ const publishArticleFormRef = ref(null);
 // 表单引用对象
 const form = reactive({
   id: null,
-  title: '',
-  content: '',
-  cover: '',
+  title: "",
+  content: "",
+  cover: "",
   categoryId: null,
   tags: [],
-  summary: ''
-})
+  summary: "",
+});
 
 // 表单校验规则
 const rules = {
   title: [
-    { required: true, message: '请输入文章标题', trigger: 'blur' },
-    { min: 1, max: 40, message: '文章标题要求大于1个字符，小于40个字符', trigger: 'blur' },
+    { required: true, message: "请输入文章标题", trigger: "blur" },
+    { min: 1, max: 40, message: "文章标题要求大于1个字符，小于40个字符", trigger: "blur" },
   ],
   content: [{ required: true }],
   cover: [{ required: true }],
-  categoryId: [{ required: true, message: '请选择文章分类', trigger: 'blur' }],
-  tags: [{ required: true, message: '请选择文章标签', trigger: 'blur' }],
-}
+  categoryId: [{ required: true, message: "请选择文章分类", trigger: "blur" }],
+  tags: [{ required: true, message: "请选择文章标签", trigger: "blur" }],
+};
 
 // 上传文章封面图片
 const handleCoverChange = (file) => {
   //表单对象
   let formData = new FormData();
   //添加file字段，并将文件传入
-  formData.append('file', file.raw);
+  formData.append("file", file.raw);
   uploadFile(formData).then((e) => {
     //响应参数，提示错误信息
     if (e.success == false) {
       let message = e.message;
-      showMessage(message, 'error');
+      showMessage(message, "error");
       return;
     }
 
     //成功则设置表单对象中的封面链接，并提示上传成功
     form.cover = e.data.url;
-    showMessage('上传成功');
-  })
-}
+    showMessage("上传成功");
+  });
+};
 
 //编辑器图片上传
 const onUploadImg = async (files, callback) => {
   const res = await Promise.all(
     files.map((file) => {
       return new Promise((rev, rej) => {
-        console.log('==>编辑器开始上传图片...');
+        console.log("==>编辑器开始上传图片...");
         let formData = new FormData();
         formData.append("file", file);
         uploadFile(formData).then((res) => {
           console.log(res);
-          console.log('访问路径：' + res.data.url)
+          console.log("访问路径：" + res.data.url);
           //调用callback函数，回显上传图片
           callback([res.data.url]);
-        })
+        });
       });
     })
   );
-}
+};
 
 // 文章分类
-const categories = ref([])
+const categories = ref([]);
 getCategorySelectList().then((e) => {
-  console.log('获取分类数据')
-  categories.value = e.data
-})
+  console.log("获取分类数据");
+  categories.value = e.data;
+});
 
 //标签select Loading状态，默认不显示
 const tagSelectLoading = ref(false);
 //文章标签
 const tags = ref([]);
 // 渲染标签数据
-getTagSelectList().then(res => {
-  tags.value = res.data
-})
+getTagSelectList().then((res) => {
+  tags.value = res.data;
+});
 //根据用户输入的标签名称，远程模糊查询
 const remoteMethod = (query) => {
-  console.log('远程搜索：' + tags.value);
+  console.log("远程搜索：" + tags.value);
   //如果用户的查询关键词不为空
   if (query) {
     //显示loading
     tagSelectLoading.value = true;
     //调用模糊查询接口
-    searchTags(query).then((e) => {
-      if (e.success = true) {
-        //设置到tags变量中
-        tags.value = e.data;
-      }
-    }).finally(() => tagSelectLoading.value = false) //隐藏loading
+    searchTags(query)
+      .then((e) => {
+        if ((e.success = true)) {
+          //设置到tags变量中
+          tags.value = e.data;
+        }
+      })
+      .finally(() => (tagSelectLoading.value = false)); //隐藏loading
   }
-}
+};
 
 // 发布文章
 const publishArticleSubmit = () => {
-  console.log('提交 md 内容：' + form.content)
+  console.log("提交 md 内容：" + form.content);
   // 校验表单
   publishArticleFormRef.value.validate((valid) => {
     if (!valid) {
-      return false
+      return false;
     }
 
     publishArticle(form).then((res) => {
       if (res.success == false) {
         // 获取服务端返回的错误消息
-        let message = res.message
+        let message = res.message;
         // 提示错误消息
-        showMessage(message, 'error')
-        return
+        showMessage(message, "error");
+        return;
       }
 
-      showMessage('发布成功')
+      showMessage("发布成功");
       // 隐藏发布文章对话框
-      isArticlePublishEditorShow.value = false
+      isArticlePublishEditorShow.value = false;
       // 将 form 表单字段置空
-      form.title = ''
-      form.content = ''
-      form.cover = ''
-      form.summary = ''
-      form.categoryId = null
-      form.tags = []
+      form.title = "";
+      form.content = "";
+      form.cover = "";
+      form.summary = "";
+      form.categoryId = null;
+      form.tags = [];
       // 重新请求分页接口，渲染列表数据
-      getTableData()
-    })
-  })
-}
+      getTableData();
+    });
+  });
+};
 
 // 是否显示编辑文章对话框
-const isArticleUpdateEditorShow = ref(false)
+const isArticleUpdateEditorShow = ref(false);
 // 编辑文章表单引用
-const updateArticleFormRef = ref(null)
+const updateArticleFormRef = ref(null);
 
 // 修改文章表单对象
 const updateArticleForm = reactive({
   id: null,
-  title: '',
-  content: '请输入内容',
-  cover: '',
+  title: "",
+  content: "请输入内容",
+  cover: "",
   categoryId: null,
   tags: [],
-  summary: ""
-})
+  summary: "",
+});
 
 // 编辑文章：上传文章封面图片
 const handleUpdateCoverChange = (file) => {
   // 表单对象
-  let formData = new FormData()
-  // 添加 file 字段，并将文件传入 
-  formData.append('file', file.raw)
+  let formData = new FormData();
+  // 添加 file 字段，并将文件传入
+  formData.append("file", file.raw);
   uploadFile(formData).then((e) => {
     // 响参失败，提示错误消息
     if (e.success == false) {
-      let message = e.message
-      showMessage(message, 'error')
-      return
+      let message = e.message;
+      showMessage(message, "error");
+      return;
     }
 
     // 成功则设置表单对象中的封面链接，并提示上传成功
-    updateArticleForm.cover = e.data.url
-    showMessage('上传成功')
-  })
-}
+    updateArticleForm.cover = e.data.url;
+    showMessage("上传成功");
+  });
+};
 
 // 编辑文章按钮点击事件
 const showArticleUpdateEditor = (row) => {
   // 显示编辑文章对话框
-  isArticleUpdateEditorShow.value = true
+  isArticleUpdateEditorShow.value = true;
   // 拿到文章 ID
-  let articleId = row.id
+  let articleId = row.id;
   getArticleDetail(articleId).then((res) => {
     if (res.success) {
       // 设置表单数据
-      updateArticleForm.id = res.data.id
-      updateArticleForm.title = res.data.title
-      updateArticleForm.cover = res.data.cover
-      updateArticleForm.content = res.data.content
-      updateArticleForm.categoryId = res.data.categoryId
-      updateArticleForm.tags = res.data.tagIds
-      updateArticleForm.summary = res.data.summary
+      updateArticleForm.id = res.data.id;
+      updateArticleForm.title = res.data.title;
+      updateArticleForm.cover = res.data.cover;
+      updateArticleForm.content = res.data.content;
+      updateArticleForm.categoryId = res.data.categoryId;
+      updateArticleForm.tags = res.data.tagIds;
+      updateArticleForm.summary = res.data.summary;
     }
-  })
-}
-
+  });
+};
 
 // 保存文章
 const updateSubmit = () => {
   updateArticleFormRef.value.validate((valid) => {
     // 校验表单
     if (!valid) {
-      return false
+      return false;
     }
 
     // 请求更新文章接口
     updateArticle(updateArticleForm).then((res) => {
       if (res.success == false) {
         // 获取服务端返回的错误消息
-        let message = res.message
+        let message = res.message;
         // 提示错误消息
-        showMessage(message, 'error')
-        return
+        showMessage(message, "error");
+        return;
       }
 
-      showMessage('保存成功')
+      showMessage("保存成功");
       // 隐藏编辑框
-      isArticleUpdateEditorShow.value = false
+      isArticleUpdateEditorShow.value = false;
       // 重新请求分页接口，渲染列表数据
-      getTableData()
-    })
-  })
-}
+      getTableData();
+    });
+  });
+};
 
 //预览
-const router = useRouter()
+const router = useRouter();
 //跳转文章详情页
-const goArticleDetailPage = (articleId) =>{
-  router.push('/article/' + articleId);
-}
+const goArticleDetailPage = (articleId) => {
+  router.push("/article/" + articleId);
+};
+
+// 点击置顶事件
+const handleIsTopChange = (row) => {
+  updateArticleIsTop({ id: row.id, isTop: row.isTop }).then((res) => {
+    // 重新请求分页接口，渲染列表数据
+    getTableData();
+
+    if (res.success == false) {
+      // 获取服务端返回的错误消息
+      let message = res.message;
+      // 提示错误消息
+      showMessage(message, "error");
+      return;
+    }
+
+    showMessage(row.isTop ? "置顶成功" : "已取消置顶");
+  });
+};
 </script>
 
 <style scoped>
