@@ -5,6 +5,7 @@ import AdminCategoryList from '@/pages/admin/category-list.vue'
 import AdminTagList from '@/pages/admin/tag-list.vue'
 import AdminBlogSettings from '@/pages/admin/blog-settings.vue'
 import Admin from '@/layouts/admin/admin.vue'
+import AdminWikiList from '@/pages/admin/wiki-list.vue'
 import Index from '@/pages/frontend/index.vue'
 import ArchiveList from '@/pages/frontend/archive-list.vue'
 import CategoryList from '@/pages/frontend/category-list.vue'
@@ -120,6 +121,13 @@ const routes = [
                 component: AdminBlogSettings,
                 meta: {
                     title: '博客设置'
+                }
+            },
+            {
+                path: "/admin/wiki/list",
+                component: AdminWikiList,
+                meta: {
+                    title: '知识库管理'
                 }
             },
         ]

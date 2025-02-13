@@ -24,8 +24,8 @@
 
 <script setup>
 import { useMenuStore } from "@/stores/menu";
-import { ref,computed } from "vue";
-import { useRoute,useRouter } from "vue-router";
+import { ref, computed } from "vue";
+import { useRoute, useRouter } from "vue-router";
 
 const menus = [
   {
@@ -49,6 +49,11 @@ const menus = [
     path: "/admin/tag/list",
   },
   {
+    name: "知识库管理",
+    icon: "Collection",
+    path: "/admin/wiki/list",
+  },
+  {
     name: "博客设置",
     icon: "Setting",
     path: "/admin/blog/settings",
@@ -66,7 +71,9 @@ const handleSelect = (path) => {
 };
 
 //是否折叠
-const isCollapse = computed(() => {return !(menuStore.menuWidth == '250px')});
+const isCollapse = computed(() => {
+  return !(menuStore.menuWidth == "250px");
+});
 </script>
 
 <style>
