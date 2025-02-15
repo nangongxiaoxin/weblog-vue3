@@ -40,23 +40,23 @@
         </el-table-column>
         <el-table-column prop="isTop" label="是否置顶">
           <template #default="scope">
-            <el-switch v-model="scope.row.isTop" inline-prompt :active-icon="Check" :inactive-icon="Close" />
+            <el-switch @change="handleIsTopChange(scope.row)" v-model="scope.row.isTop" inline-prompt :active-icon="Check" :inactive-icon="Close" />
           </template>
         </el-table-column>
         <el-table-column prop="createTime" label="发布时间" />
         <el-table-column prop="isPublish" label="是否发布">
           <template #default="scope">
-            <el-switch v-model="scope.row.isPublish" inline-prompt :active-icon="Check" :inactive-icon="Close" />
+            <el-switch @change="handleIsPublishChange(scope.row)" v-model="scope.row.isPublish" inline-prompt :active-icon="Check" :inactive-icon="Close" />
           </template>
         </el-table-column>
         <el-table-column fixed="right" label="操作" width="160">
           <template #default="scope">
             <el-tooltip class="box-item" effect="dark" content="编辑" placement="bottom">
-              <el-button size="small" :icon="Edit" circle> </el-button>
+              <el-button size="small" @click="showEditWikiDialog(scope.row)" :icon="Edit" circle> </el-button>
             </el-tooltip>
 
             <el-tooltip class="box-item" effect="dark" content="编辑目录" placement="bottom">
-              <el-button size="small" :icon="Tickets" circle> </el-button>
+              <el-button size="small" @click="showEditWikiCatalogDialog(scope.row)" :icon="Tickets" circle> </el-button>
             </el-tooltip>
 
             <el-tooltip class="box-item" effect="dark" content="预览" placement="bottom">
@@ -64,7 +64,7 @@
             </el-tooltip>
 
             <el-tooltip class="box-item" effect="dark" content="删除" placement="bottom">
-              <el-button type="danger" size="small" :icon="Delete" circle> </el-button>
+              <el-button type="danger" size="small" @click="deleteWikiSubmit(scope.row)" :icon="Delete" circle> </el-button>
             </el-tooltip>
           </template>
         </el-table-column>
@@ -96,6 +96,30 @@
         </el-form-item>
       </el-form>
     </FormDialog>
+
+    <!-- 编辑知识库 -->
+    <FormDialog ref="editFormDialogRef" title="编辑知识库" destroyOnClose @submit="onEditWikiSubmit">
+      <el-form ref="editFormRef" :rules="rules" :model="editForm">
+        <el-form-item label="标题" prop="title" label-width="80px" size="large">
+          <el-input v-model="editForm.title" placeholder="请输入知识库标题" maxlength="20" show-word-limit clearable />
+        </el-form-item>
+        <el-form-item label="封面" prop="cover" label-width="80px" size="large">
+          <el-upload class="avatar-uploader" action="#" :on-change="handleUpdateCoverChange" :auto-upload="false" :show-file-list="false">
+            <img v-if="editForm.cover" :src="editForm.cover" class="avatar" />
+            <el-icon v-else class="avatar-uploader-icon">
+              <Plus />
+            </el-icon>
+          </el-upload>
+        </el-form-item>
+        <el-form-item label="摘要" prop="summary" label-width="80px" size="large">
+          <!-- :rows="3" 指定 textarea 默认显示 3 行 -->
+          <el-input v-model="editForm.summary" :rows="3" maxlength="30" show-word-limit type="textarea" placeholder="请输入知识库摘要" clearable />
+        </el-form-item>
+      </el-form>
+    </FormDialog>
+
+    <!-- 目录编辑 -->
+    <WikiCatalogEditDialog ref="editCatalogFormDialogRef" title="编辑目录" width="70%" destroyOnClose></WikiCatalogEditDialog>
   </div>
 </template>
 
@@ -103,10 +127,11 @@
 import { ref, reactive } from "vue";
 import { Search, RefreshRight, Check, Close, Delete, Edit, Tickets, View } from "@element-plus/icons-vue";
 import moment from "moment";
-import { getWikiPageList, addWiki } from '@/api/admin/wiki'
+import { getWikiPageList, addWiki, updateWikiIsTop, updateWikiIsPublish, deleteWiki, updateWiki } from "@/api/admin/wiki";
 import FormDialog from "@/components/FormDialog.vue";
 import { uploadFile } from "@/api/admin/file";
-import { showMessage } from "@/composables/util";
+import { showMessage, showModel } from "@/composables/util";
+import WikiCatalogEditDialog from "@/components/WikiCatalogEditDialog.vue";
 
 // 模糊搜索的知识库标题
 const searchWikiTitle = ref("");
@@ -208,13 +233,13 @@ const addWikiBtnClick = () => {
 };
 
 // 表单引用
-const formRef = ref(null)
+const formRef = ref(null);
 // 表单对象
 const form = reactive({
-    title: '',
-    cover: '',
-    summary: ''
-})
+  title: "",
+  cover: "",
+  summary: "",
+});
 
 // 表单校验规则
 const rules = {
@@ -251,37 +276,184 @@ const handleCoverChange = (file) => {
 
 //上传
 const onSubmit = () => {
-    // 先验证 form 表单字段
-    formRef.value.validate((valid) => {
-        if (!valid) {
-            console.log('表单验证不通过')
-            return false
+  // 先验证 form 表单字段
+  formRef.value.validate((valid) => {
+    if (!valid) {
+      console.log("表单验证不通过");
+      return false;
+    }
+
+    // 显示提交按钮 loading
+    formDialogRef.value.showBtnLoading();
+    addWiki(form)
+      .then((res) => {
+        if (!res.success) {
+          // 获取服务端返回的错误消息
+          let message = res.message;
+          // 提示错误消息
+          showMessage(message, "error");
+          return;
         }
-        
-        // 显示提交按钮 loading
-        formDialogRef.value.showBtnLoading()
-        addWiki(form).then((res) => {
-            if (!res.success) {
-                // 获取服务端返回的错误消息
-                let message = res.message
-                // 提示错误消息
-                showMessage(message, 'error')
-                return
-            }
 
-            showMessage('添加成功')
-            // 将表单中数据置空
-            form.title = ''
-            form.cover = ''
-            form.summary = ''
-            // 隐藏对话框
-            formDialogRef.value.close()
-            // 重新请求分页接口，渲染数据
-            getTableData()
-        }).finally(() => formDialogRef.value.closeBtnLoading()) // 隐藏提交按钮 loading
+        showMessage("添加成功");
+        // 将表单中数据置空
+        form.title = "";
+        form.cover = "";
+        form.summary = "";
+        // 隐藏对话框
+        formDialogRef.value.close();
+        // 重新请求分页接口，渲染数据
+        getTableData();
+      })
+      .finally(() => formDialogRef.value.closeBtnLoading()); // 隐藏提交按钮 loading
+  });
+};
 
+// 更新置顶
+const handleIsTopChange = (row) => {
+  updateWikiIsTop({ id: row.id, isTop: row.isTop }).then((res) => {
+    // 重新请求分页接口，渲染列表数据
+    getTableData();
+
+    if (res.success == false) {
+      // 获取服务端返回的错误消息
+      let message = res.message;
+      // 提示错误消息
+      showMessage(message, "error");
+      return;
+    }
+
+    showMessage(row.isTop ? "置顶成功" : "已取消置顶");
+  });
+};
+
+// 更新发布状态
+const handleIsPublishChange = (row) => {
+  updateWikiIsPublish({ id: row.id, isPublish: row.isPublish }).then((res) => {
+    // 重新请求分页接口，渲染列表数据
+    getTableData();
+
+    if (res.success == false) {
+      // 获取服务端返回的错误消息
+      let message = res.message;
+      // 提示错误消息
+      showMessage(message, "error");
+      return;
+    }
+
+    showMessage(row.isPublish ? "发布成功" : "已取消发布");
+  });
+};
+
+// 删除知识库
+const deleteWikiSubmit = (row) => {
+  showModel("是否确定要删除该知识库？")
+    .then(() => {
+      deleteWiki(row.id).then((res) => {
+        if (res.success == false) {
+          // 获取服务端返回的错误消息
+          let message = res.message;
+          // 提示错误消息
+          showMessage(message, "error");
+          return;
+        }
+
+        showMessage("删除成功");
+        // 重新请求分页接口，渲染数据
+        getTableData();
+      });
     })
-}
+    .catch((e) => {
+      console.log("取消了");
+    });
+};
+
+// 更新知识库对话框引用
+const editFormDialogRef = ref(null);
+
+// 弹出知识库编辑对话框
+const showEditWikiDialog = (row) => {
+  editFormDialogRef.value.open();
+  editForm.id = row.id;
+  editForm.title = row.title;
+  editForm.cover = row.cover;
+  editForm.summary = row.summary;
+};
+
+// 表单引用
+const editFormRef = ref(null);
+// 表单对象
+const editForm = reactive({
+  id: null,
+  title: "",
+  cover: "",
+  summary: "",
+});
+
+// 知识库编辑：上传封面图片
+const handleUpdateCoverChange = (file) => {
+  // 表单对象
+  let formData = new FormData();
+  // 添加 file 字段，并将文件传入
+  formData.append("file", file.raw);
+  uploadFile(formData).then((e) => {
+    // 响参失败，提示错误消息
+    if (e.success == false) {
+      let message = e.message;
+      showMessage(message, "error");
+      return;
+    }
+
+    // 成功则设置表单对象中的封面链接，并提示上传成功
+    editForm.cover = e.data.url;
+    showMessage("上传成功");
+  });
+};
+
+// 编辑知识库提交事件
+const onEditWikiSubmit = () => {
+  // 先验证 form 表单字段
+  editFormRef.value.validate((valid) => {
+    if (!valid) {
+      console.log("表单验证不通过");
+      return false;
+    }
+
+    // 显示提交按钮 loading
+    editFormDialogRef.value.showBtnLoading();
+    updateWiki(editForm)
+      .then((res) => {
+        if (!res.success) {
+          // 获取服务端返回的错误消息
+          let message = res.message;
+          // 提示错误消息
+          showMessage(message, "error");
+          return;
+        }
+
+        showMessage("更新成功");
+        // 将编辑表单中数据置空
+        editForm.id = null;
+        editForm.title = "";
+        editForm.cover = "";
+        editForm.summary = "";
+        // 隐藏对话框
+        editFormDialogRef.value.close();
+        // 重新请求分页接口，渲染数据
+        getTableData();
+      })
+      .finally(() => editFormDialogRef.value.closeBtnLoading()); // 隐藏提交按钮 loading
+  });
+};
+
+// 编辑目录对话框是否显示
+const editCatalogFormDialogRef = ref(null);
+
+// 编辑目录按钮点击事件
+const showEditWikiCatalogDialog = (row) => {
+  // 显示编辑目录对话框, 并传入知识库 ID
+  editCatalogFormDialogRef.value.open(row.id);
+};
 </script>
 
 <style scoped>
