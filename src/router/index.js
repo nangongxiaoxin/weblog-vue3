@@ -14,6 +14,7 @@ import TagList from '@/pages/frontend/tag-list.vue'
 import Login from '@/pages/admin/login.vue'
 import TagArticleList from '@/pages/frontend/tag-article-list.vue'
 import ArticleDetail from '@/pages/frontend/article-detail.vue'
+import WikiList from '@/pages/frontend/wiki-list.vue'
 import NotFound from '@/pages/frontend/404.vue'
 
 
@@ -76,6 +77,13 @@ const routes = [
         }
     },
     {
+        path: '/wiki/list', // 知识库
+        component: WikiList,
+        meta: {
+            title: '知识库'
+        }
+    },
+    {
         path: '/:pathMatch(.*)*', //404页
         name: 'NotFound',
         component: NotFound,
@@ -131,7 +139,7 @@ const routes = [
                 }
             },
         ]
-        
+
     }
 ]
 
@@ -140,7 +148,7 @@ const router = createRouter({
     // 指定路由的历史管理方式，hash 模式指的是 URL 的路径是通过 hash 符号（#）进行标识
     history: createWebHashHistory(),
     // routes: routes 的缩写
-    routes, 
+    routes,
     // 每次切换路由后，页面滚动到顶部
     scrollBehavior() {
         return { top: 0 }
