@@ -15,6 +15,7 @@ import Login from '@/pages/admin/login.vue'
 import TagArticleList from '@/pages/frontend/tag-article-list.vue'
 import ArticleDetail from '@/pages/frontend/article-detail.vue'
 import WikiList from '@/pages/frontend/wiki-list.vue'
+import WikiDetail from '@/pages/frontend/wiki-detail.vue'
 import NotFound from '@/pages/frontend/404.vue'
 
 
@@ -81,6 +82,13 @@ const routes = [
         component: WikiList,
         meta: {
             title: '知识库'
+        }
+    },
+    {
+        path: '/wiki/:wikiId', // 知识库详情页
+        component: WikiDetail,
+        meta: {
+            title: '知识库详情'
         }
     },
     {

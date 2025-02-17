@@ -8,12 +8,12 @@
       <div v-if="wikis && wikis.length > 0" v-for="(wiki, index) in wikis" :key="index" class="col-span-12 md:col-span-6 lg:col-span-4 animate__animated animate__fadeInUp">
         <div class="relative bg-white h-full border border-gray-200 rounded-lg hover:scale-[1.03] dark:bg-gray-800 dark:border-gray-700">
           <!-- 知识库封面 -->
-          <a class="cursor-pointer">
+          <a @click="goWikiArticleDetailPage(wiki.id, wiki.firstArticleId)" class="cursor-pointer">
             <img class="rounded-t-lg h-36 w-full" :src="wiki.cover" />
           </a>
           <div class="p-5">
             <!-- 知识库标题 -->
-            <a class="cursor-pointer">
+            <a @click="goWikiArticleDetailPage(wiki.id, wiki.firstArticleId)" class="cursor-pointer">
               <h2 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
                 <span class="hover:border-gray-600 hover:border-b-2 dark:hover:border-gray-400">{{ wiki.title }}</span>
               </h2>
@@ -44,14 +44,23 @@ import UserInfoCard from "@/layouts/frontend/components/UserInfoCard.vue";
 import TagListCard from "@/layouts/frontend/components/TagListCard.vue";
 import CategoryListCard from "@/layouts/frontend/components/CategoryListCard.vue";
 import ScrollToTopButton from "@/layouts/frontend/components/ScrollToTopButton.vue";
-import { getWikiList } from '@/api/frontend/wiki'
-import { ref } from 'vue'
+import { getWikiList } from "@/api/frontend/wiki";
+import { ref } from "vue";
+import { useRouter } from "vue-router";
 
 // 知识库
-const wikis = ref([])
-getWikiList().then(res => {
-    if (res.success) {
-        wikis.value = res.data
-    }
-})
+const wikis = ref([]);
+getWikiList().then((res) => {
+  if (res.success) {
+    wikis.value = res.data;
+  }
+});
+
+const router = useRouter();
+
+// 跳转文章详情页
+const goWikiArticleDetailPage = (wikiId, articleId) => {
+  console.log("跳转" + wikiId + "," + articleId);
+  router.push({ path: "/wiki/" + wikiId, query: { articleId } });
+};
 </script>

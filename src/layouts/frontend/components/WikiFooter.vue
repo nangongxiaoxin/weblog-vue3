@@ -1,5 +1,5 @@
 <template>
-    <footer class="bg-white mt-5 dark:bg-gray-800">
+    <footer class="bg-white relative z-40 border-t border-b border-gray-200 mt-5 dark:bg-[#0d1117] dark:border-gray-900">
         <div class="w-full mx-auto max-w-screen-xl py-6 px-5 md:flex md:items-center md:justify-between">
             <span class="text-sm text-gray-500 sm:text-center dark:text-gray-400">© 2019 <a href="https://www.slilio.com/"
                     class="hover:underline">天幻小栈</a>. All Rights Reserved.
