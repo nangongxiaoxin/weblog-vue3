@@ -1,31 +1,43 @@
 <template>
   <div class="main min-h-screen flex flex-col">
-    <WikiHeader></WikiHeader>
+    <WikiHeader :catalogs="catalogs"></WikiHeader>
     <main class="grow container max-w-screen-3xl mx-auto px-4 sm:px-6 md:px-8 py-4">
       <!-- 左边栏 -->
-      <div class="lg:block fixed z-20 inset-0 top-[5.5rem] left-[max(0px,calc(50%-45rem))] right-auto w-[19rem] pb-10 pl-8 pr-6 overflow-y-auto">
-        <div id="accordion-flush" data-accordion="collapse" data-active-classes="bg-white dark:bg-[#0d1117] dark:text-gray-300" data-inactive-classes="">
-          <div v-for="(catalog, index) in catalogs" :key="index">
-            <h2 :id="'accordion-flush-heading-' + catalog.id">
-              <button type="button" class="hover:bg-gray-100 flex items-center justify-between w-full py-3 px-3 rounded-lg font-medium rtl:text-right text-gray-500 dark:text-gray-400 gap-3 dark:hover:bg-gray-800" :data-accordion-target="'#accordion-flush-body-' + catalog.id" :aria-expanded="[Array.isArray(catalog.children) && catalog.children.some(item => item.articleId == route.query.articleId) ? true : false]" :aria-controls="'accordion-flush-body-' + catalog.id">
-                <!-- 一级目录标题 -->
-                <span class="flex items-center" v-html="catalog.title"></span>
-                <!-- 箭头 -->
-                <svg data-accordion-icon class="w-3 h-3 rotate-90 transition-all shrink-0" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
-                  <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5 5 1 1 5" />
-                </svg>
-              </button>
-            </h2>
-            <!-- 二级目录 -->
-            <ul :id="'accordion-flush-body-' + catalog.id" class="hidden" :aria-labelledby="'accordion-flush-heading-' + catalog.id">
-              <!-- 二级目录标题 -->
-              <li v-for="(childCatalog, index2) in catalog.children" :key="index2" class="flex items-center ps-10 py-2 pe-3 rounded-lg cursor-pointer dark:text-gray-400" :class="[childCatalog.articleId == route.query.articleId ? 'bg-sky-50 text-sky-600 dark:bg-sky-950 dark:text-sky-500' : 'hover:bg-gray-100 dark:hover:bg-gray-800']" @click="goWikiArticleDetailPage(childCatalog.articleId)" v-html="childCatalog.title"></li>
-            </ul>
+      <div class="hidden lg:block fixed z-20 inset-0 top-[5.5rem] right-auto w-[19rem] pb-10 pr-6 overflow-y-auto" :class="[isExpand ? 'left-[max(0px,calc(50%-45rem))] w-[20rem] pl-8' : 'left-0 w-0 pl-0 2xl:left-[max(0px,calc(50%-45rem))] 2xl:w-[19rem] 2xl:pl-8']">
+        <div class="flex">
+          <!-- 知识库目录 -->
+          <div class="grow" :class="[isExpand ? 'block' : 'hidden 2xl:block']">
+            <div id="accordion-flush" data-accordion="collapse" data-active-classes="bg-white dark:bg-[#0d1117] dark:text-gray-300" data-inactive-classes="" class="last:pb-[170px]">
+              <div v-for="(catalog, index) in catalogs" :key="index">
+                <h2 :id="'accordion-flush-heading-' + catalog.id">
+                  <button type="button" class="hover:bg-gray-100 flex items-center justify-between w-full py-3 px-3 rounded-lg font-medium rtl:text-right text-gray-500 dark:text-gray-400 gap-3 dark:hover:bg-gray-800" :data-accordion-target="'#accordion-flush-body-' + catalog.id" :aria-expanded="[Array.isArray(catalog.children) && catalog.children.some((item) => item.articleId == route.query.articleId) ? true : false]" :aria-controls="'accordion-flush-body-' + catalog.id">
+                    <!-- 一级目录标题 -->
+                    <span class="flex items-center" v-html="catalog.title"></span>
+                    <!-- 箭头 -->
+                    <svg data-accordion-icon class="w-3 h-3 rotate-90 transition-all shrink-0" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+                      <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5 5 1 1 5" />
+                    </svg>
+                  </button>
+                </h2>
+                <!-- 二级目录 -->
+                <ul :id="'accordion-flush-body-' + catalog.id" class="hidden" :aria-labelledby="'accordion-flush-heading-' + catalog.id">
+                  <!-- 二级目录标题 -->
+                  <li v-for="(childCatalog, index2) in catalog.children" :key="index2" class="flex items-center ps-10 py-2 pe-3 rounded-lg cursor-pointer dark:text-gray-400" :class="[childCatalog.articleId == route.query.articleId ? 'bg-sky-50 text-sky-600 dark:bg-sky-950 dark:text-sky-500' : 'hover:bg-gray-100 dark:hover:bg-gray-800']" @click="goWikiArticleDetailPage(childCatalog.articleId)" v-html="childCatalog.title"></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- 点击收缩、展开 -->
+          <div class="hidden md:inline-block 2xl:hidden transition-all" @click="shrinkAndExpand">
+            <div id="left-toc-sidebar" class="left-toc-sidebar top-[5.5rem]">
+              <span id="left-toc-sidebar-arrow" class="arrow start flex items-center justify-center" :class="[isExpand ? '-rotate-90' : 'rotate-90']"> </span>
+            </div>
           </div>
         </div>
       </div>
       <!-- 中间栏 -->
-      <div class="lg:pl-[22.5rem]">
+      <div class="transition-all duration-300" :class="[isExpand ? 'lg:pl-[22.5rem]' : 'lg:pl-0 2xl:pl-[22.5rem]']">
         <div class="max-w-3xl mx-auto xl:max-w-none xl:ml-0 xl:mr-[15.5rem] xl:pr-16">
           <!-- 文章 -->
           <article>
@@ -167,34 +179,29 @@ import { getArticleDetail } from "@/api/frontend/article";
 import { useDark } from "@vueuse/core";
 import hljs from "highlight.js/lib/common";
 import "highlight.js/styles/tokyo-night-dark.css";
-import { getWikiArticlePreNext, getWikiCatalogs } from '@/api/frontend/wiki'
+import { getWikiArticlePreNext, getWikiCatalogs } from "@/api/frontend/wiki";
 import { initAccordions } from "flowbite";
-
-
-onMounted(() => {
-});
 
 const route = useRoute();
 const router = useRouter();
-const catalogs = ref([])
+const catalogs = ref([]);
+
+onMounted(() => {});
 
 // 获取当前知识库的目录数据
-getWikiCatalogs(route.params.wikiId).then(res => {
-    if (res.success) {
-        catalogs.value = res.data
-        // 获取数据成功后，初始化 Accordions 组件
-        nextTick(() => initAccordions())
-    }
-})
-
+getWikiCatalogs(route.params.wikiId).then((res) => {
+  if (res.success) {
+    catalogs.value = res.data;
+    // 获取数据成功后，初始化 Accordions 组件
+    nextTick(() => initAccordions());
+  }
+});
 
 // 是否为暗黑模式
 const isDark = useDark();
 
 // 文章数据
 const article = ref({});
-
-
 
 // 获取文章详情
 function refreshArticleDetail(articleId) {
@@ -254,9 +261,12 @@ function refreshArticleDetail(articleId) {
   getWikiArticlePreNext({ id: route.params.wikiId, articleId: articleId }).then((res) => {
     if (res.success) {
       preNext.value = res.data;
+      // 获取数据成功后，初始化 Accordions 组件
+      nextTick(() => initAccordions());
     }
   });
 }
+
 refreshArticleDetail(route.query.articleId);
 
 const handleMouseEnter = (event) => {
@@ -299,7 +309,12 @@ watch(route, (newRoute, oldRoute) => {
   refreshArticleDetail(newRoute.query.articleId);
 });
 
-
+// 目录是否展开，默认为 true
+const isExpand = ref(true);
+// 点击收缩、展开
+const shrinkAndExpand = () => {
+  isExpand.value = !isExpand.value;
+};
 </script>
 
 <style scoped>
@@ -686,5 +701,38 @@ watch(route, (newRoute, oldRoute) => {
 .rotate-180 {
   --tw-rotate: 180deg;
   transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+
+/* 收缩、展开相关样式 */
+.left-toc-sidebar {
+  position: fixed;
+  bottom: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  transition: left 0.3s ease;
+}
+
+.left-toc-sidebar:hover {
+  background: rgba(127, 127, 127, 0.05);
+  cursor: pointer;
+}
+
+/* 箭头 */
+.left-toc-sidebar .arrow {
+  display: inline-block;
+  vertical-align: middle;
+  width: 1em;
+  height: 1em;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='rgba(0,0,0,0.5)' d='M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z'/%3E%3C/svg%3E");
+  line-height: normal;
+  transition: all 0.3s;
+}
+
+/* 暗黑主题下箭头 */
+html[class="dark"] .left-toc-sidebar .arrow {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='rgba(255,255,255,0.5)' d='M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z'/%3E%3C/svg%3E");
 }
 </style>
