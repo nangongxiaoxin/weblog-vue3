@@ -147,6 +147,9 @@
             </div>
           </nav>
         </div>
+
+        <!-- 评论组件 -->
+        <Comment></Comment>
       </div>
 
       <!--  TODO右侧组件增加粘性效果 -->
@@ -183,6 +186,7 @@ import CategoryListCard from "@/layouts/frontend/components/CategoryListCard.vue
 import TagListCard from "@/layouts/frontend/components/TagListCard.vue";
 import UserInfoCard from "@/layouts/frontend/components/UserInfoCard.vue";
 import Toc from "@/layouts/frontend/components/Toc.vue";
+import Comment from "@/components/Comment.vue";
 import { useRoute, useRouter } from "vue-router";
 import { getArticleDetail } from "@/api/frontend/article";
 import { nextTick, ref, watch, onMounted } from "vue";
