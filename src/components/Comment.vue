@@ -4,7 +4,7 @@
       全部评论<span>({{ total }})</span>
     </h2>
     <!-- 卡片 -->
-    <div class="w-full px-5 py-10 mb-3 bg-white border border-gray-200 rounded-lg dark:bg-gray-800 dark:border-gray-700">
+    <div :class="props.customeCss">
       <!-- 评论发布表单 -->
       <form>
         <div class="flex gap-3">
@@ -51,10 +51,10 @@
             <div class="w-full mt-4 mb-4 border border-gray-200 rounded-lg bg-gray-50 dark:bg-gray-700 dark:border-gray-600">
               <div class="px-4 py-2 bg-white rounded-t-lg dark:bg-gray-800">
                 <label for="comment" class="sr-only">Your comment</label>
-                <textarea id="comment" rows="4" class="w-full px-0 text-sm text-gray-900 bg-white border-0 dark:bg-gray-800 focus:ring-0 dark:text-white dark:placeholder-gray-400" placeholder="发表一个友善的评论吧..." required></textarea>
+                <textarea id="comment" rows="4" v-model="commentForm.content" class="w-full px-0 text-sm text-gray-900 bg-white border-0 dark:bg-gray-800 focus:ring-0 dark:text-white dark:placeholder-gray-400" placeholder="发表一个友善的评论吧..." required></textarea>
               </div>
               <div class="flex items-center justify-between px-3 py-2 border-t dark:border-gray-600">
-                <div class="inline-flex items-center py-2.5 px-4 text-xs font-medium text-center text-white bg-sky-600 rounded-lg focus:ring-4 focus:ring-sky-200 dark:focus:ring-sky-900 hover:bg-sky-700">发送</div>
+                <div @click="onPublishCommentClick" class="inline-flex items-center py-2.5 px-4 text-xs font-medium text-center text-white bg-sky-600 rounded-lg focus:ring-4 focus:ring-sky-200 dark:focus:ring-sky-900 hover:bg-sky-700">发送</div>
                 <div class="flex ps-0 space-x-1 rtl:space-x-reverse sm:ps-2">
                   <!-- Emoji -->
                   <div data-popover-target="popover-emoji" type="button" class="inline-flex justify-center items-center p-2 text-gray-500 rounded cursor-pointer hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-600">
@@ -77,16 +77,26 @@
         </div>
       </form>
 
-      <!-- 评论列表 -->
+      <!-- 评论显示列表 -->
       <div v-if="comments && comments.length > 0" v-for="(comment, index) in comments" :key="index">
-        <!-- 一级评论 -->
+        <!-- 边界线 -->
+        <div v-if="index > 0" class="border-t ml-12 mt-5  border-gray-100 dark:border-gray-700"></div>
+        <!-- 一级评论显示 -->
         <div class="flex gap-3 mt-5">
           <!-- 左边头像栏 -->
           <div>
-            <img v-if="comment.avatar && comment.avatar.length > 0" :src="comment.avatar" class="w-10 h-10 rounded-full" />
-            <svg v-else class="w-10 h-10 text-gray-400 rounded-full dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M10 0a10 10 0 1 0 10 10A10.011 10.011 0 0 0 10 0Zm0 5a3 3 0 1 1 0 6 3 3 0 0 1 0-6Zm0 13a8.949 8.949 0 0 1-4.951-1.488A3.987 3.987 0 0 1 9 13h2a3.987 3.987 0 0 1 3.951 3.512A8.949 8.949 0 0 1 10 18Z" />
-            </svg>
+            <a v-if="comment.website && comment.website.length > 0" @click="jumpToWebsite(comment.website)" class="cursor-pointer">
+              <img v-if="comment.avatar && comment.avatar.length > 0" :src="comment.avatar" class="w-10 h-10 rounded-full" />
+              <svg v-else class="w-10 h-10 text-gray-400 rounded-full dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M10 0a10 10 0 1 0 10 10A10.011 10.011 0 0 0 10 0Zm0 5a3 3 0 1 1 0 6 3 3 0 0 1 0-6Zm0 13a8.949 8.949 0 0 1-4.951-1.488A3.987 3.987 0 0 1 9 13h2a3.987 3.987 0 0 1 3.951 3.512A8.949 8.949 0 0 1 10 18Z" />
+              </svg>
+            </a>
+            <div v-else>
+              <img v-if="comment.avatar && comment.avatar.length > 0" :src="comment.avatar" class="w-10 h-10 rounded-full" />
+              <svg v-else class="w-10 h-10 text-gray-400 rounded-full dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M10 0a10 10 0 1 0 10 10A10.011 10.011 0 0 0 10 0Zm0 5a3 3 0 1 1 0 6 3 3 0 0 1 0-6Zm0 13a8.949 8.949 0 0 1-4.951-1.488A3.987 3.987 0 0 1 9 13h2a3.987 3.987 0 0 1 3.951 3.512A8.949 8.949 0 0 1 10 18Z" />
+              </svg>
+            </div>
           </div>
           <!-- 右边评论信息 -->
           <div class="flex flex-col gap-2 grow">
@@ -104,20 +114,36 @@
           </div>
         </div>
 
-        <!-- 二级评论 -->
+        <!-- 二级评论显示 -->
         <div class="ml-12" v-if="comment.childComments && comment.childComments.length > 0">
           <div v-for="(childComment, index2) in comment.childComments" :key="index2">
             <!-- 头像、昵称、评论内容 -->
             <div class="flex items-center gap-3 mt-5">
               <!-- 左边头像栏 -->
               <div>
-                <img v-if="childComment.avatar && childComment.avatar.length > 0" :src="childComment.avatar" class="w-6 h-6 rounded-full" />
-                <svg v-else class="w-6 h-6 text-gray-400 rounded-full dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M10 0a10 10 0 1 0 10 10A10.011 10.011 0 0 0 10 0Zm0 5a3 3 0 1 1 0 6 3 3 0 0 1 0-6Zm0 13a8.949 8.949 0 0 1-4.951-1.488A3.987 3.987 0 0 1 9 13h2a3.987 3.987 0 0 1 3.951 3.512A8.949 8.949 0 0 1 10 18Z" />
-                </svg>
+                <a v-if="childComment.website && childComment.website.length > 0" @click="jumpToWebsite(childComment.website)" class="cursor-pointer">
+                  <img v-if="childComment.avatar && childComment.avatar.length > 0" :src="childComment.avatar" class="w-6 h-6 rounded-full" />
+                  <svg v-else class="w-6 h-6 text-gray-400 rounded-full dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M10 0a10 10 0 1 0 10 10A10.011 10.011 0 0 0 10 0Zm0 5a3 3 0 1 1 0 6 3 3 0 0 1 0-6Zm0 13a8.949 8.949 0 0 1-4.951-1.488A3.987 3.987 0 0 1 9 13h2a3.987 3.987 0 0 1 3.951 3.512A8.949 8.949 0 0 1 10 18Z" />
+                  </svg>
+                </a>
+                <div v-else>
+                  <img v-if="childComment.avatar && childComment.avatar.length > 0" :src="childComment.avatar" class="w-6 h-6 rounded-full" />
+                  <svg v-else class="w-6 h-6 text-gray-400 rounded-full dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M10 0a10 10 0 1 0 10 10A10.011 10.011 0 0 0 10 0Zm0 5a3 3 0 1 1 0 6 3 3 0 0 1 0-6Zm0 13a8.949 8.949 0 0 1-4.951-1.488A3.987 3.987 0 0 1 9 13h2a3.987 3.987 0 0 1 3.951 3.512A8.949 8.949 0 0 1 10 18Z" />
+                  </svg>
+                </div>
               </div>
               <!-- 昵称 -->
-              <div class="text-xs text-[#FB7299] font-bold">{{ childComment.nickname }}</div>
+              <div class="text-xs text-[#FB7299] font-bold">
+                {{ childComment.nickname }}
+                <!-- 【回复 @xxx】 -->
+                <span v-if="childComment.replyNickname" class="text-gray-400 font-normal ml-1 mr-1"
+                  >回复
+                  <span class="text-sky-600 font-normal text-sm">@{{ childComment.replyNickname }}</span>
+                  <span class="text-gray-400"> :</span>
+                </span>
+              </div>
               <!-- 评论内容 -->
               <div class="text-sm dark:text-gray-400">{{ childComment.content }}</div>
             </div>
@@ -179,7 +205,7 @@
                   <textarea id="comment" rows="4" v-model="replyContent" class="w-full px-0 text-sm text-gray-900 bg-white border-0 dark:bg-gray-800 focus:ring-0 dark:text-white dark:placeholder-gray-400" :placeholder="replyPlaceholderText" required></textarea>
                 </div>
                 <div class="flex items-center justify-between px-3 py-2 border-t dark:border-gray-600">
-                  <div class="inline-flex items-center py-2.5 px-4 text-xs font-medium text-center text-white bg-sky-600 rounded-lg focus:ring-4 focus:ring-sky-200 dark:focus:ring-sky-900 hover:bg-sky-700">发送</div>
+                  <div @click="onReplyContentSubmit" class="inline-flex items-center py-2.5 px-4 text-xs font-medium text-center text-white bg-sky-600 rounded-lg focus:ring-4 focus:ring-sky-200 dark:focus:ring-sky-900 hover:bg-sky-700">发送</div>
                   <div class="flex ps-0 space-x-1 rtl:space-x-reverse sm:ps-2">
                     <!-- Emoji -->
                     <div data-popover-target="popover-emoji2" type="button" class="inline-flex justify-center items-center p-2 text-gray-500 rounded cursor-pointer hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-600">
@@ -206,16 +232,29 @@
           </div>
         </form>
       </div>
+
+      <!-- 没有评论的提示文字 -->
+      <div v-else class="flex items-center mt-10 mb-10 justify-center text-gray-400">还没有任何评论哟~</div>
     </div>
   </div>
 </template>
 
 <script setup>
 import { useCommentStore } from "@/stores/comment";
-import { ref, reactive, onMounted, nextTick } from "vue";
+import { ref, reactive, onMounted, nextTick, watch } from 'vue'
 import { initTooltips, initPopovers } from "flowbite";
-import { getUserInfoByQQ } from "@/api/frontend/comment";
+import { publishComment, getComments, getUserInfoByQQ } from "@/api/frontend/comment";
+import { useRoute } from "vue-router";
+import { showMessage } from "@/composables/util";
 
+const route = useRoute();
+// 监听路由
+watch(route, (newRoute, oldRoute) => {
+    // 设置评论表单中的路由路径
+    commentForm.routerUrl = route.query.articleId ? (route.path + '?articleId=' + route.query.articleId) : route.path
+    // 重新渲染评论数据
+    initComments()
+})
 onMounted(() => {
   initTooltips();
   initPopovers();
@@ -233,8 +272,8 @@ const addReplyEmoji = (emoji) => {
 };
 // 添加 Emoji 表情
 const addEmoji = (emoji) => {
-    commentForm.content = commentForm.content + emoji
-}
+  commentForm.content = commentForm.content + emoji;
+};
 // 昵称输入框 blur 事件
 const onNicknameInputBlur = () => {
   let nickname = commentStore.userInfo.nickname;
@@ -265,6 +304,9 @@ function checkIfPureNumber(text) {
 
 // 展示回复表单
 const showReplyForm = (index, nickname, replyCommentId, parentCommentId) => {
+  currReplyCommentId.value = replyCommentId;
+  currParentCommentId.value = parentCommentId;
+
   // 先将评论数组中一级评论的所有 isShowReplyForm 字段设置为 false
   comments.value.forEach((comment) => (comment.isShowReplyForm = false));
   // 拿到当前下标的评论
@@ -289,40 +331,134 @@ const replyPlaceholderText = ref("发表一个友善的评论吧...");
 const replyContent = ref("");
 
 // 评论数组
-const comments = ref([
-  {
-    id: 39818,
-    avatar: "https://qh.qlogo.cn/g?b=sdk&ek=AQCCUxlJ6SzcyLnoceicwiaOoqHLfHPDJ48xj7dsbLzfP3LPC0YFw9ibWW1UaIicy2vIIZvUpLDf&s=100&t=1690161385",
-    nickname: "野比大雄",
-    website: null,
-    content: "头像和昵称可以自动获取了\uD83D\uDE03",
-    createTime: "2024-03-09 09:33:46",
-    replyNickname: null,
-    childComments: [],
-    isShowReplyForm: null,
-  },
-  {
-    id: 39813,
-    avatar: "https://qh.qlogo.cn/g?b=sdk&ek=AQDW4PNnLEibrRIicSnnZZrBD2siaNCiaiaQec1LEccHQRM7IJun9EAoLh4vU0iasibTHjTKbCFic1VC&s=100&t=1593000563",
-    nickname: "璞暮",
-    website: null,
-    content: "观望\uD83E\uDD11",
-    createTime: "2024-03-06 13:41:56",
-    replyNickname: null,
-    childComments: [
-      {
-        id: 39814,
-        avatar: "https://qh.qlogo.cn/g?b=sdk&ek=AQAJ99lfkKA9TldbMpTOicsyfib30JOuNnqdaFehfOzYz8qEQo3f7JbY24mCKYoZ5meJibLeuDq&s=100&t=1681803828",
-        nickname: "犬小哈",
-        website: null,
-        content: "欢迎欢迎\uD83D\uDE0E",
-        createTime: "2024-03-07 11:52:30",
-        replyNickname: null,
-        childComments: null,
-        isShowReplyForm: null,
-      },
-    ],
-    isShowReplyForm: null,
-  },
-]);
+const comments = ref([]);
+
+function initComments() {
+	// 通过路由 query 中的 artilceId 是否为空，来判断是文章详情页，还是 wiki 详情页，从而设置不同的路由地址
+    let path = route.query.articleId ? (route.path + '?articleId=' + route.query.articleId) : route.path
+    // 获取当前路由下的所有评论
+    getComments(path).then(res => {
+        if (res.success) {
+            total.value = res.data.total
+            comments.value = res.data.comments
+        }
+    })
+}
+initComments();
+
+// 评论表单
+const commentForm = reactive({
+    avatar: '',
+    content: '',
+    mail: '',
+    nickname: '',
+    routerUrl: route.query.articleId ? (route.path + '?articleId=' + route.query.articleId) : route.path,
+    website: '',
+    replyCommentId: null,
+    parentCommentId: null
+})
+
+// 初始化 commentForm 表单对象中的用户信息
+function initFormCommentUserInfo() {
+  commentForm.avatar = commentStore.userInfo.avatar;
+  commentForm.mail = commentStore.userInfo.mail;
+  commentForm.nickname = commentStore.userInfo.nickname;
+  commentForm.website = commentStore.userInfo.website;
+}
+initFormCommentUserInfo();
+
+// 邮箱正则
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+// 一级评论发布点击事件
+const onPublishCommentClick = () => {
+  initFormCommentUserInfo();
+  // 校验
+  if (commentForm.nickname.length === 0) {
+    showMessage("请填写 QQ 号或昵称", "warning");
+    return;
+  }
+  if (commentForm.mail.length === 0 || !emailRegex.test(commentForm.mail)) {
+    showMessage("邮箱格式不正确", "warning");
+    return;
+  }
+  if (commentForm.content.length === 0) {
+    showMessage("请填写评论内容", "warning");
+    return;
+  }
+
+  publishComment(commentForm).then((res) => {
+    if (!res.success) {
+      // 获取服务端返回的错误消息
+      let message = res.message;
+      // 提示错误消息
+      showMessage(message, "error");
+      return;
+    }
+
+    showMessage("评论发布成功");
+    // 将表单对象中的 content 评论内容置空
+    commentForm.content = "";
+    // 重新渲染表单列表
+    initComments();
+  });
+};
+
+// 当前回复的评论 ID
+const currReplyCommentId = ref(null);
+// 当前回复的父级 ID
+const currParentCommentId = ref(null);
+
+// 评论回复发送事件
+const onReplyContentSubmit = () => {
+  initFormCommentUserInfo();
+  // 校验
+  if (commentForm.nickname.length === 0) {
+    showMessage("请填写 QQ 号或昵称", "warning");
+    return;
+  }
+  if (commentForm.mail.length === 0 || !emailRegex.test(commentForm.mail)) {
+    showMessage("邮箱格式不正确", "warning");
+    return;
+  }
+  if (replyContent.value.length === 0) {
+    showMessage("请填写回复内容", "warning");
+    return;
+  }
+  // 评论回复内容
+  commentForm.content = replyContent.value;
+  commentForm.replyCommentId = currReplyCommentId.value;
+  commentForm.parentCommentId = currParentCommentId.value;
+
+  // 请求接口
+  publishComment(commentForm).then((res) => {
+    if (!res.success) {
+      // 获取服务端返回的错误消息
+      let message = res.message;
+      // 提示错误消息
+      showMessage(message, "error");
+      return;
+    }
+
+    showMessage("回复评论成功");
+    // 将评论回复的内容置空
+    replyContent.value = "";
+    commentForm.content = "";
+    // 重新渲染评论列表
+    initComments();
+  });
+};
+
+// 跳转评论用户网址
+const jumpToWebsite = (url) => {
+    // 在新窗口访问新的链接地址
+    window.open(url.startsWith('http') ? url : 'http://' + url, '_blank');
+}
+
+// 对外暴露属性
+const props = defineProps({
+    customeCss: {
+        type: String,
+        default: 'w-full px-5 py-10 mb-3 bg-white border border-gray-200 rounded-lg dark:bg-gray-800 dark:border-gray-700'
+    }
+})
 </script>

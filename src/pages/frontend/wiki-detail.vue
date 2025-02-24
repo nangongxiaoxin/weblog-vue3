@@ -155,6 +155,9 @@
               </div>
             </nav>
           </article>
+
+          <!-- 评论组件 -->
+          <Comment customeCss=""></Comment>
         </div>
       </div>
       <!-- 右边栏 right-[max(0px,calc(50%-50rem))] 右边缘位置，max()取最大的值;calc(),计算该元素50%位置减去50rem；rem相对root<html>根字体大小 -->
@@ -172,6 +175,7 @@
 import WikiHeader from "@/layouts/frontend/components/WikiHeader.vue";
 import WikiFooter from "@/layouts/frontend/components/WikiFooter.vue";
 import ScrollToTopButton from "@/layouts/frontend/components/ScrollToTopButton.vue";
+import Comment from '@/components/Comment.vue'
 import WikiToc from "@/layouts/frontend/components/WikiToc.vue";
 import { ref, watch, nextTick, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
