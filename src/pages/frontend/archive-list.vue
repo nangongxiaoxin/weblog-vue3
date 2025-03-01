@@ -13,7 +13,7 @@
                     <time class="text-lg font-semibold text-gray-900 dark:text-white">{{ archive.month }}</time>
                     <ol class="mt-3 divide-y divider-gray-200 dark:divide-gray-700">
                         <li v-for="(article, index2) in archive.articles" :key="index2">
-                            <a href="#" class="items-center block p-3 sm:flex hover:bg-gray-100 dark:hover:bg-gray-700">
+                            <a  @click="router.push('/article/'+ article.id)" class="items-center block p-3 sm:flex hover:bg-gray-100 dark:hover:bg-gray-700">
                                 <img class="w-24 h-12 mb-3 mr-3 rounded-lg sm:mb-0" :src="article.cover" />
                                 <div class="text-gray-600 dark:text-gray-400">
                                     <h2 class="text-base font-normal text-gray-900">
@@ -108,6 +108,9 @@ import TagListCard from '@/layouts/frontend/components/TagListCard.vue'
 import CategoryListCard from '@/layouts/frontend/components/CategoryListCard.vue'
 import { getArchivePageList } from '@/api/frontend/archive'
 import { onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter();
 
 // 文章归档
 const archives = ref([])

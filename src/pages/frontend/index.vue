@@ -13,7 +13,9 @@
             <div class="bg-white hover:scale-[1.03] h-full border border-gray-200 rounded-lg dark:bg-gray-800 dark:border-gray-700">
               <!-- 文章封面 -->
               <a @click="goArticleDetailPage(article.id)" class="cursor-pointer">
-                <img class="rounded-t-lg h-48 w-full" :src="article.cover" />
+                <div class="rounded-t-lg h-48 w-full overflow-hidden">
+                  <img class="h-full w-full object-cover" :src="article.cover" />
+                </div>
               </a>
               <div class="p-5">
                 <!-- 标签 -->
@@ -162,3 +164,11 @@ const goArticleDetailPage = (articleId) => {
   router.push("/article/" + articleId);
 };
 </script>
+
+<style scoped>
+.image {
+  width: 100%; /* 图片宽度填充容器 */
+  height: 100%; /* 图片高度填充容器 */
+  object-fit: cover; /* 保持比例并裁切超出部分 */
+}
+</style>

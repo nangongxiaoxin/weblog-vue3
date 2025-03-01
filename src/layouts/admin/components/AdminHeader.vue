@@ -48,7 +48,7 @@
           <span class="el-dropdown-link flex items-center justify-center text-gray-700 text-xs dark:text-gray-500">
             <!-- 头像 Avatar -->
             <el-avatar class="mr-2" :size="25"
-              src="https://img.quanxiaoha.com/quanxiaoha/f97361c0429d4bb1bc276ab835843065.jpg" />
+              src="https://tianhuan-1252376673.cos.ap-beijing.myqcloud.com/webLogImg/cc329bc0ad794fb48239799c011a44f5.png" />
             {{ userStore.userInfo.username }}
             <el-icon class="el-icon--right">
               <arrow-down />
