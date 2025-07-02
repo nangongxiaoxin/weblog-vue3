@@ -6,7 +6,7 @@ import { useUserStore } from '@/stores/user'
 //创建axios实例
 const instance = axios.create({
     baseURL: "/api", //api接口地址
-    timeout: 7000, //请求超时时间
+    timeout: 15000, //请求超时时间
 })
 
 //添加请求拦截器
