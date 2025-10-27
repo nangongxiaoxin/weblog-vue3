@@ -20,14 +20,14 @@ router.beforeEach((to, from, next) => {
         //若用户已经登录，且重复访问登录页
         showMessage('请勿重复登录', 'warning');
         next({ path: '/admin/index' });
-    }else if (!to.path.startsWith('/admin')) {
+    } else if (!to.path.startsWith('/admin')) {
         // 如果访问的非 /admin 前缀路由
         // 引入博客设置 store
         let blogSettingsStore = useBlogSettingsStore()
         // 获取博客设置信息并保存到全局状态中
         blogSettingsStore.getBlogSettings()
         next()
-    }else {
+    } else {
         next();
     }
 })
@@ -35,7 +35,7 @@ router.beforeEach((to, from, next) => {
 //全局路由后置守卫
 router.afterEach((to, from) => {
     //动态设置页面Title
-    let title = (to.meta.title ? to.meta.title : '') + ' - Weblog';
+    let title = '> ' + (to.meta.title ? to.meta.title : '') + ' <';
     document.title = title;
 
     //隐藏页面加载loading
